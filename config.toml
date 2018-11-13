@@ -3,3 +3,8 @@ languageCode = "en-us"
 title = "WebLogic Cafe"
 theme = "ananke"
 publishDir = "docs"
+disqusShortname = "markxnelson"
+googleAnalytics = "UA-129126578-1"
+
+[[parms]]
+  background_color_class = "bg-lightest-blue"
