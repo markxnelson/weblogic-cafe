@@ -1,0 +1,5 @@
+baseURL = "http://weblogic.cafe/"
+languageCode = "en-us"
+title = "WebLogic Cafe"
+theme = "ananke"
+publishDir = "docs"
