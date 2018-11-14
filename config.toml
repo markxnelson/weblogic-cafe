@@ -7,3 +7,6 @@ disqusShortname = "markxnelson"
 googleAnalytics = "UA-129126578-1"
 copyright = "Copyright (c) 2018, Mark Nelson"
 relativeURLs = true
+
+[params]
+  featured_image = "/images/cafe.jpg"
