@@ -9,7 +9,11 @@ aliases: [/about]
 ---
 # About WebLogic Café
 
-Welcome to the WebLogic Café.
+Welcome to the WebLogic Café.  This is the blog of Mark Nelson, an architect 
+at Oracle, in the WebLogic team.  I work with technologies like Docker, 
+Kubernetes, Istio, OpenShift, ELK, Prometheus, Grafana, as well as developer
+focused technology areas like CI/CD.  So that's the kind of thing I will 
+be writing about here!  
 
 
 ### Credits
