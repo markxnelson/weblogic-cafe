@@ -10,3 +10,4 @@ relativeURLs = true
 
 [params]
   featured_image = "/images/cafe.jpg"
+  body_classes = "avenir bg-near-white"
