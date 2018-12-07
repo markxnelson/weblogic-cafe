@@ -433,7 +433,50 @@ OpenShift.
 
 ## Creating a compute instance
 
-abc
+Now we can create our compute instance where we will install OpenShift.  To do 
+this, we go to the "Compute" menu, then "Instances" and click on the "Create
+Instance" button.  This will bring up the following page:
+
+{{< figure src="/images/openshift015.png" >}}
+
+You will need to do the following: 
+
+* Give the image a name, I used `openshift`,
+* Click on the "Change Image Source" button and choose "Custom Images" and 
+  select the "RHEL 7.4" image we just created,
+* Choose an instance type (VM or BM), 
+* Choose the instance shape that you want to use, you probably want a fairly
+  large one so you can run a lot of domains and clusters.  I used a `VM.Standard2.16`
+  while has 16 OCPUs and 240GB of RAM.  You can see the definitions of the 
+  various shapes [here](https://cloud.oracle.com/compute/pricing).
+* Choose a custom boot volume size, I used 200GB.  If you are just doing testing
+  and development, it is easiest to just put all your data on this volume.  In 
+  production you might want to use NFS or something else instead, so you might 
+  not need quite as large a boot volume.
+* Add a SSH public key - this is the key that you will use to SSH into your 
+  new instance.
+* The networking section defaults should be fine.
+
+Once you have all this set up, click on the "Create" button to create the 
+instance. 
+
+{{< figure src="/images/openshift016.png" >}}
+
+If you open your instance in the OCI console you can get the public IP address
+and you should now be able to SSH into your instance and become the superuser:
+
+```
+[Fri Dec 07 11:17:04] marnelso@MARNELSO-mac weblogic-on-openshift (master) 
+$ ssh -i ~/.ssh/openshift opc@129.146.53.62
+The authenticity of host '129.146.53.62 (129.146.53.62)' can't be established.
+ECDSA key fingerprint is SHA256:C/YRPeEpsdf789sdf7d89sJYpIt43ZhaKHheaLMG7vM.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '129.146.53.62' (ECDSA) to the list of known hosts.
+[opc@openshift ~]$ sudo su -
+[root@openshift ~]# 
+```
+
+Now we are ready to set up the prerequisites.
 
 ## Setting up the prerequisties for OpenShift
 
