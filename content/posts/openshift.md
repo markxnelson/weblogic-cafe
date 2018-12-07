@@ -1,7 +1,7 @@
 ---
 title: "Running OpenShift on OCI"
-date: 2018-12-06T14:07:54-05:00
-draft: true
+date: 2018-12-07T17:00:00-05:00
+draft: false
 toc: true
 taxonomies:
   tag: oci, openshift
