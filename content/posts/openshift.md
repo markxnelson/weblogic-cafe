@@ -10,10 +10,30 @@ In this post, I want to share my experiences with running WebLogic on
 OpenShift.  This is not strictly a "how to" because I did take a few 
 small short cuts, but I think that it is still (hopefully) pretty helpful.
 
-I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the "all in one" 
+I am going to set up OpenShift Enterprise 3.11 on a single compute instance 
+on Oracle Cloud Infrastructure (OCI), so I am using the "all in one" 
 configuration.  This means that the master and the worker node is on the 
 same machine.  This is not a production configuration, but it is fine for
-testing purposes.
+testing and development purposes.
+
+## Overview
+
+Here's an overview of the process I will walk through in this post:
+
+* Prepare the OCI tenancy to run OpenShift - set up compartments, groups,
+  policies, instance principals, and so on
+* Create a RHEL 7.4 custom image in OCI (since OCI does not provide any
+  RHEL images)
+* Create a compute instance using that custom image
+* Install and configure OpenShift in that instance
+* Prepare my WebLogic Docker images
+* Install the WebLogic Operator for Kubernetes
+* Create some WebLogic domains
+* Explore the various other integrations like load balancing WebLogic 
+  clusters, exporting metric to Prometheus, and scaling clusters
+
+To follow along, you will need a RedHat subscription which includes 
+RHEL and OpenShift Enterprise, and an OCI tenancy.
 
 ## Preparing your OCI tenancy to run OpenShift
 
@@ -99,6 +119,38 @@ in the first instance.  So that instance needs to be able to act as a principal
 to call the necessary OCI APIs to create the second instance. (I hope all of this
 instance principal stuff makes sense!)
 
+**Create the Virtual Cloud Network**
+
+You need to create your Virtual Cloud Network before we move on to the next 
+steps.  You do this in the "Networks" menu, then "Virtual Cloud Networks". 
+Make sure you are in the right compartment, then click on the big blue
+"Create Virtual Cloud Network" button.  Just give it a name (I used `OpenShiftVCN`),
+and check the "Create virtual cloud network plus related resources" option, 
+leave everything else at the defaults and click on "Create Virtual Cloud Network".
+When it is done, click on the "Close" button.
+
+{{< figure src="/images/openshift009.png" >}}
+
+You will see your new VCN, click on that to view it, and then find the subnet 
+that matches the Availability Domain that you want to use, I used `AD-3`.
+
+{{< figure src="/images/openshift010.png" >}}
+
+Click on the security list for that subnet to view it, then click on the "Edit 
+All Rules" button.  Find the rule for ICMP, and change it from `3, 4` to `All`:
+
+{{< figure src="/images/openshift011.png" >}}
+
+Click on the "+ Another Ingress Rule" button to create another rule, and set it 
+up for source CIDR `0.0.0.0/0` and destination port `80`:
+
+{{< figure src="/images/openshift012.png" >}}
+
+Now click on the "Save security list rules" button to save them.  Now your 
+security list should look like this:
+
+{{< figure src="/images/openshift013.png" >}}
+
 ## Creating the RHEL 7.4 custom image
 
 OCI does not provide a RHEL image, so we are going to need to create one. 
@@ -142,7 +194,42 @@ tenancy=ocid1.tenancy.oc1..aaaaaaaafsdhjkfds789fdshjkfds789fdskjdsf789dfshkfds79
 region=us-phoenix-1
 ```
 
+**Create Pre-authenticated Request**
+
+In order for our terraforming to access the ISO image in the next step
+without the need for any complex authentication work, we can create a 
+*Pre-authenticated request* which will permit access to the ISO image 
+without authentication for a short period of time - provided you happen
+to know the magic URL! 
+
+To create it, click on the "three dots" next to your ISO image and choose 
+"Create Pre-Authenticated Request" from the menu:
+
+{{< figure src="/images/openshift005.png" >}}
+
+You need to give it a name, and you can keep the read-only option and
+set a reasonable expiration time - a couple of hours will be plenty of time:
+
+{{< figure src="/images/openshift006.png" >}}
+
+It will give you a URL to access the ISO file - make sure you keep that URL, 
+you will need it later:
+
+{{< figure src="/images/openshift007.png" >}}
+
 **Creating the image**
+
+As I mentioned earlier, we will use Terraform to drive the image creation 
+process.  It is going to work like this:
+
+{{< figure src="/images/openshift008.png" >}}
+
+We will start `Instance1` which will boot from the standard Oracle Linux
+image provided by OCI.  It will start up a IPXE boot server and mount the
+RHEL ISO using the pre-authenticated request URL.  Then we will start a 
+second instance (`Instance2`) with no OS and we will boot it from the IPXE
+server running in `Instance1` and drive the RHEL installation in this instance.
+When we are done we will create a *custom image* from `Instance2`.  
 
 You can download my sample code from GitHub by cloning 
 [this repository](https://github.com/markxnelson/weblogic-on-openshift) as 
@@ -152,97 +239,197 @@ follows:
 git clone https://github.com/markxnelson/weblogic-on-openshift
 ```
 
-abc
+In this repository, you will see a `terraform` directory.  That is what we
+will use in this step.  (We will use the others later)
+
+To get ready to run this you will first of all need terraform installed
+if you don't already have it.  You can get that from [here](https://www.terraform.io/downloads.html).
+You will also need the OCI Terraform provider, which you can download
+from [here](https://github.com/terraform-providers/terraform-provider-oci/releases).
+
+To set up the OCI provider, follow the instructions [here](https://www.terraform.io/docs/providers/oci/guides/version-3-upgrade.html).  You will see this talks about the provider block:
 
 ```
-terraform plan
+provider "oci" {
+  version          = ">= 3.0.0"
+  region           = "${var.region}"
+  tenancy_ocid     = "${var.tenancy_ocid}"
+  user_ocid        = "${var.user_ocid}"
+  fingerprint      = "${var.fingerprint}"
+  private_key_path = "${var.private_key_path}"
+}
 ```
 
+This is located in the file `terraform/variable.tf` in my repository. It is
+set up to take the values from the environment.  So you can just edit the
+`env-vars` file and put the values in there:
 
-This example provides a method to generate a RHEL 7.4 image for use by both VM and BM shapes.
+{{< highlight bash "linenos=table,hl_lines=2-5 8 11 16" >}}
+### Authentication details
+export TF_VAR_tenancy_ocid="xxx"
+export TF_VAR_user_ocid="xxx"
+export TF_VAR_fingerprint="xxx"
+export TF_VAR_private_key_path="xxx"
 
-Please consult the Changelog for the latest changes to this process!
+### Optional API Private key passphrase (if set)
+export TF_VAR_private_key_password="xxx"
 
-There are several prerequisites:
+### Region
+export TF_VAR_region="us-phoenix-1"
 
-1. You MUST setup a Dynamic Group for the Compartment in which you are going to run this process.  The
-   Dynamic Group allows the ipxe instance itself to authenticate to OCI so that no user configuration is
-   needed to create the image.
+### Public keys used on the instance
+## NOTE: These are not your api keys. More info on the right keys see
+## https://docs.us-phoenix-1.oraclecloud.com/Content/Compute/Tasks/managingkeypairs.htm
+export TF_VAR_ssh_public_key=$(cat xxx)
+{{< / highlight >}}
 
-   Information on how to create a Dynamic Group can be found here:
-   https://docs.us-phoenix-1.oraclecloud.com/Content/Identity/Tasks/managingdynamicgroups.htm?Highlight=Dynamic%20Group
+Note the highlighted lines, these are the ones where you need to make 
+updates.  The `TF_VAR_private_key_path` on line 5 is for your OCI API key
+and the `TF_VAR_private_key_password` on line 8 is the password for that
+same key.
 
-   In short, from the console:
-   - Get the Compartment OCID for the Compartment you will be using.
-   - In Identity, select Dynamic Groups
-   - Click on the Create Dynamic Group box
-   - Specify a name for the group
-   - Click on the link labeled "Launch Rule Builder"
-   - Select 'in Compartment ID' as the Resource Attribute
-   - Enter the Compartment OCID in the Value box
-   - Click on the Add Rule button
-   - Click on the Create Dynamic Group button.
+The `TF_VAR_ssh_public_key` on line 16 is for the SSH key that you would 
+use to SSH into an instance.  This is different to your API key! 
 
-   The compartment is now enabled for Instance Principals.  If you do not want this after the image is
-   created, simply delete the Dynamic Group AFTER the image is created.  Deletion of the DG will not
-   affect the usability of the image.
+You will need to update `TF_VAR_region` to match the region where you have
+capacity to run these instances.
 
-   You MUST create a policy that gives this dynamic group permission to use OCI APIs. The simplest way
-   is to just let it call all APIs for the compartment you are using, by adding a policy to the root
-   compartment with a rule like this:
-
-```
-Allow dynamic-group CertificationSubscriptionUsers to manage all-resources in compartment Certification
-```
-
-
-2. You MUST have a valid RedHat account with subscriptions available.  The TF template needs a
-   RH Username and Password to allow you to temporarily subscribe the instance that is building the image
-   and get access to the various RH repos.
-2. The template expects pre-configured VCNs and Subnets.
-3. You need to provide a URL that points to the RHEL 7.4 ISO.  This URL must contain the name of the ISO,
-   with an '.iso' extension.  An OCI Pre-Authenticated Request (PAR) works well for this operation.  How to create
-   OCI PARs can be found here: https://docs.us-phoenix-1.oraclecloud.com/Content/Object/Tasks/managingobjects.htm#par.
-4. The template uses filters that expect unique Compartment, VCN and Subnet names.
-   NOTE: The root compartment CANNOT be used for this process.
-5. The following must be specified in your shell environment (prefixed with TF_VAR_ of course):
-    - tenancy_ocid
-    - user_ocid
-    - fingerprint
-    - private_key_path
-    - private_key_password (if required)
-    - ssh_public_key (the actual public key, not the file)
-    - region
-6. The subnet to be used must have the following configuration:
-	- Port 80 TCP must be allowed on the subnet
-	- All ICMP traffic must be allowed on the subnet (ICMP All)
-
-NOTE: A template env-vars file is provided as part of this example.  Simply complete the items inside the template and source the result into your shell by using:
+Once you have all your updates in place, you can source this file into your
+shell to make these variables available to terraform:
 
 ```
 . ./env-vars
 ```
 
-Using this template is simple:
+Next, let's look at our `configuration.tf`, again the lines you need to update
+are highlighted:
 
-1. Set your environment variables
-2. Open the configuration.tf file and substitute the values in each of the sections appropriate to your environment
-   NOTE: The AD is specified as either 'AD-x' or 'ad-x' where x is the AD number you wish to use for the process.
-3. Execute 'terraform plan; terraform apply'
-4. Get coffee or favorite beverage...
-5. After your image is created, execute 'terraform destroy -force' (there will not be a resource to actually kill,
-   so force is required).
+{{< highlight bash "linenos=table,hl_lines=7 17-18 31-34" >}}
+# Set your information here:
 
-What happens in the background:
-The template generates a script that embeds all the configuration files needed to build the iPXE server, extract the ISO
-boot the instance used to load RHEL, causes RHEL to load, builds the image, destroys the build instance, and finally destroys the iPXE server.  You are left with a custom image named "RHEL_74" in your environment.
+# iso_url - specify the URL for the RHEL ISO.  This can be any publically accessible URL.
+# The URL must contain the name of the ISO image with an '.iso' extension.
 
-NOTE: The source configuration files for the iPXE server are included here.  It is *STRONGLY* recommended that they not be
-      altered.
+variable "iso_url" {
+	default = "<your pre-authenticated request url>"
+}
 
-Enjoy.
+# RHEL account variables:
+# user_name - The user name of the account that holds the subscription
+# password - password for said user name
 
+variable "rhel_account" {
+	type = "map"
+	default = {
+		user_name = "<your redhat account>"
+		password = "<your password>"
+	}
+}
 
+# Build environment variables:
+# compartment - your compartment name
+# ad - which Availability Domain to use. Format in either AD-x or ad-x where 'x' is the AD number
+# vcn - the display name of the vcn to use
+# subnet - display name of the subnet to use
+
+variable "build_env" {
+	type = "map"
+	default = {
+		compartment = "<your compartment>"
+		ad = "<your AD>"
+		vcn = "<your VCN>"
+		subnet = "<your subnet>"
+	}
+}
+{{< / highlight >}}
+
+On line 7, you need to put in that pre-authenticated request URL we saved in an 
+earlier step.
+
+On lines 17 and 18, you put in your RedHat credentials.  The `user_name` in this 
+case is probably your email address (not the short userid).
+
+On lines 31 to 34, you will put in your OCI details. `compartment` is the name 
+of your compartment (not the OCID), `ad` will be a string like `AD-3`, `vcn` will
+be the name of your VCN (not the OCID) and `subnet` will be the name (not the OCID)
+of the subnet you want to use (it has to be a public one), it will probably look
+something like `Public Subnet VPGL:PHX-AD-3`.
+
+Next, you need to edit the `variable.tf` file to set the correct shape to use. 
+This will depend on what shapes you have available.  You can use either a VM or
+BM shape.  I used a `VM.Standard2.8` which is actually much, much bigger than 
+we need, but that is just what I had free.  Pretty much any shape should work 
+for you.  Set the shape on line 24:
+
+{{< highlight bash "linenos=table,hl_lines=6,linenostart=19" >}}
+variable "ipxe_instance" {
+	type = "map"
+	default = {
+		name = "ipxe-rhel74"
+		hostname = "ipxe-rhel74"
+		shape = "VM.Standard2.8"
+	}
+}
+{{< / highlight >}}
+
+Now we are ready to run it!  First, make sure terraform is ready by running this
+command:
+
+```
+terraform init
+```
+
+This will check all your conifguration is correct and the OCI provider is installed
+correctly.  If you get any failures here, you will have to go and fix them before
+you can continue.
+
+Once that has completed successfully, you want to run the "plan" command:
+
+```
+terraform plan
+```
+
+This will look at your OCI environment and work out what needs to actually be done.
+It will not take any action, but it will print out details of what it *would* do
+if you ran it.  You should read through this output carefully to make sure you
+know what it is going to do before moving on.  Check again it is pointing to the
+right compartment! 
+
+When you are ready to continue, run the "apply" command:
+
+```
+terraform apply
+```
+
+Now be aware that this is going to take some time to complete, maybe 30 to 60 minutes. 
+The following things are going to happen:
+
+* The template generates a script that embeds all the configuration files needed 
+  to build the iPXE server, extract the ISO boot the instance used to load RHEL, 
+* It starts up an instance and runs this script,
+* It starts a new instace, causes RHEL to load, builds the image, and destroys 
+  the build instance, and then
+* Destroys the iPXE server.  
+
+You are left with a custom image named "RHEL_74" in your environment.  You can 
+watch all of this happening in the OCI console, and if you are curious you can 
+also SSH into the instances and run `journalctl -f` to watch the logs.
+
+After your image is created, you should execute this command to 
+clean up (there will not be a resource to actually kill, so force is required):
+
+```
+terraform destroy -force
+```
+
+You should be able to see your new custom image in the OCI Console under "Compute"
+and then "Custom Images":
+
+{{< figure src="/images/openshift014.png" >}}
+
+Now that we have our custom RHEL 7.4 image in OCI, we can use that to create 
+compute instances running RHEL! So now we are ready to go ahead and set up
+OpenShift.
 
 ## Creating a compute instance
 
