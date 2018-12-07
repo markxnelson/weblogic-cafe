@@ -24,6 +24,11 @@ in the "Identity" menu, then "Compartments".
 
 {{< figure src="/images/openshift001.png" >}}
 
+Notice the OCID on this page - you will need this value later, you may 
+want to copy it and save it somewhere. 
+
+**Groups**
+
 Now we should set up some *groups* so we can control access to our 
 compartment with *policies*.  In the "Indentity" menu, go to "Groups" and 
 create two groups: 
@@ -32,6 +37,8 @@ create two groups:
 * `OpenShiftUsers`
 
 {{< figure src="/images/openshift002.png" >}}
+
+**Policies**
 
 In the "Identity" menu, go to "Policies" and make sure you choose your root 
 compartment, not the compartment you jsut created!  Create a new policy, I
@@ -45,14 +52,52 @@ called mine `OpenShiftAdministratorsPolicy` and add these five *policy statement
 
 In the "policy versioning" section choose the option to "keep policy current".
 
+{{< figure src="/images/openshift003.png" >}}
 
-policy CertificationAdminsPolicy to let admins do everything in that compartment
-group CertificationUsers
-policy CerticiationUserPolicy to let regular users read/etc. in that compartment
-dynamic group CertificationSubscription users with rule matching any instance in that compartment, to enable instance principals for that compartment
-policy CertificationSubscriptionUserPolicy to all that dynamic group to call any API in that compartment
-Downloaded RHEL 7.4 ISO from RH and uplaoded to object store using oci cli.
+Create another policy called `OpenShiftUsersPolicy` for regular users.
+Keep the policy current and add the following policy statements to this policy:
 
+* `Allow group OpenShiftUsers to use all-resources in compartment OpenShift`
+* `Allow group OpenShiftUsers to inspect all-resources in tenancy`
+* `Allow group OpenShiftUsers to read instances in tenancy`
+* `Allow group OpenShiftUsers to read audit-events in tenancy`
+* `Allow group OpenShiftUsers to read all-resources in tenancy`
+
+**Dynamic Group (Instance Principals)**
+
+Now we need to create a *dynamic group* to enable "instance principals" for
+this compartment.  "Instance principal" means that a compute instance can 
+act as a "principal" and we can control which API calls it can make by 
+writing policies for this dynamic group - just like we would normally write
+policies for IAM users or groups - so in essence this lets us treat a compute
+instance as an actor in its own right.  In the dynamic group itself, we 
+set a rule to determine which instances in the compartment it will apply to.
+In this case we will use this to control which instances will be able to 
+use our RHEL subscription. 
+
+In the "Identity" menu, under "Dynamic groups" create a new dynamic group 
+called `OpenShiftSubscriptionUsers` and add this rule:
+
+* `ALL {instance.compartment.id = 'xxx'}`
+
+Replace the `xxx` with the OCID of your compartment - the one that you
+saved in an earlier step.  This rule will match all compute instances in 
+this compartment.
+
+**Subscription Policy**
+
+In the "Identity" menu, under "Policies" create a new policy called 
+called `OpenShiftSubscriptionPolicy`, keep it current and add this policy 
+statement:
+
+* `Allow dynamic-group OpenShiftSubscriptionUsers to manage all-resources in compartment OpenShift`
+
+The reason we need this is because we are going to run an Oracle Linux instance
+with a ipxe boot server in it, and then it will create another instance, and
+boot that instance and install RHEL into it by booting from that server running
+in the first instance.  So that instance needs to be able to act as a principal
+to call the necessary OCI APIs to create the second instance. (I hope all of this
+instance principal stuff makes sense!)
 
 ## Creating the RHEL 7.4 custom image
 
@@ -62,19 +107,56 @@ our compute instance from.  I used Terraform to create this image.  Before
 starting, you will need to sign up for a RedHat subscription (if you don't 
 already have one).
 
+**Get the RHEL 7.4 ISO**
+
+First create a bucket if you
+don't already have one.  This is done in the "Object Storage" menu under "Object 
+Storage".  Make sure you choose your compartment - don't create it in the 
+root compartment.  I called my bucket `ISO-Images`.
+
+{{< figure src="/images/openshift004.png" >}}
+
+You will now need to download the RHEL 7.4 ISO from the RedHat subscription
+download site and then upload it into your object store using the OCI CLI (because
+it is too large to upload through the web UI).  Here is the command to 
+upload to image into this bucket:
+
+```
+oci os object put --bucket-name ISO-Images --file rhel-server-7.4-x86_64-dvd.iso
+```
+
+If you don't have the OCI CLI installed, you can find out how to [install it
+and set up the config file here](https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliinstall.htm).
+
+Getting those config files right can be a challenge, so here is what mine 
+looks like, with the values changed, to give you a sample to work from:
+
+```
+$ cat ~/.oci/config
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaawwn54sdf789sdfjkasdhhjksfd890adsfjkajasfd890asdfzmra
+fingerprint=3d:5c:f9:7a:34:fd:e7:ab:4a:ba:34:52:d4:77:e5:e9
+key_file=/Users/marnelso/.oci/oci_api_key.pem
+pass_phrase=WebLogicCafe
+tenancy=ocid1.tenancy.oc1..aaaaaaaafsdhjkfds789fdshjkfds789fdskjdsf789dfshkfds79sx63imq
+region=us-phoenix-1
+```
+
+**Creating the image**
+
 You can download my sample code from GitHub by cloning 
 [this repository](https://github.com/markxnelson/weblogic-on-openshift) as 
 follows:
 
-{{< highlight bash >}}
+```
 git clone https://github.com/markxnelson/weblogic-on-openshift
-{{< / highlight >}}
+```
 
 abc
 
-{{< highlight bash >}}
+```
 terraform plan
-{{< / highlight >}}
+```
 
 
 This example provides a method to generate a RHEL 7.4 image for use by both VM and BM shapes.
@@ -178,11 +260,11 @@ abc
 
 abc
 
-### Getting the WebLogic Docker image
+## Getting the WebLogic Docker image
 
 abc
 
-### Setting up the WebLogic Operator for Kubernetes
+## Setting up the WebLogic Operator for Kubernetes
 
 abc
 
