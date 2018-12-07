@@ -1,6 +1,6 @@
 ---
 title: "Running WebLogic on OpenShift (on OCI)"
-date: 2018-12-03T14:07:54-05:00
+date: 2018-12-06T14:07:54-05:00
 draft: true
 toc: true
 taxonomies:
@@ -10,8 +10,7 @@ In this post, I want to share my experiences with running WebLogic on
 OpenShift.  This is not strictly a "how to" because I did take a few 
 small short cuts, but I think that it is still (hopefully) pretty helpful.
 
-I am going to set up OpenShift Enterprise 3.11 on a single compute instance
-on Oracle Cloud Infrastructure (OCI), so I am using the "all in one" 
+I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the "all in one" 
 configuration.  This means that the master and the worker node is on the 
 same machine.  This is not a production configuration, but it is fine for
 testing purposes.
@@ -19,14 +18,34 @@ testing purposes.
 ## Preparing your OCI tenancy to run OpenShift
 
 Before we start, we need to set up our tenancy to run OpenShift. Let's 
-start by creating a *compartment*, I called mine "OpenShift".  You can 
+start by creating a *compartment*, I called mine `OpenShift`.  You can 
 create a compartment in [the OCI Console](https://console.us-phoenix-1.oraclecloud.com)
 in the "Identity" menu, then "Compartments".
 
 {{< figure src="/images/openshift001.png" >}}
 
-compartment Certification
-group CertificationAdministrators
+Now we should set up some *groups* so we can control access to our 
+compartment with *policies*.  In the "Indentity" menu, go to "Groups" and 
+create two groups: 
+
+* `OpenShiftAdministrators` - add yourself to this group, and
+* `OpenShiftUsers`
+
+{{< figure src="/images/openshift002.png" >}}
+
+In the "Identity" menu, go to "Policies" and make sure you choose your root 
+compartment, not the compartment you jsut created!  Create a new policy, I
+called mine `OpenShiftAdministratorsPolicy` and add these five *policy statements*:
+
+* `Allow group OpenShiftAdministrators to manage all-resources in compartment OpenShift`
+* `Allow group OpenShiftAdministrators to inspect all-resources in tenancy`
+* `Allow group OpenShiftAdministrators to read instances in tenancy`
+* `Allow group OpenShiftAdministrators to read all-resources in tenancy`
+* `Allow group OpenShiftAdministrators to manage repos in tenancy`
+
+In the "policy versioning" section choose the option to "keep policy current".
+
+
 policy CertificationAdminsPolicy to let admins do everything in that compartment
 group CertificationUsers
 policy CerticiationUserPolicy to let regular users read/etc. in that compartment
@@ -158,3 +177,12 @@ abc
 ## Getting ready to run WebLogic
 
 abc
+
+### Getting the WebLogic Docker image
+
+abc
+
+### Setting up the WebLogic Operator for Kubernetes
+
+abc
+
