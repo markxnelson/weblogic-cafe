@@ -3,8 +3,7 @@ title: "Running OpenShift on OCI"
 date: 2018-12-07T17:00:00-05:00
 draft: false
 toc: true
-taxonomies:
-  tag: oci, openshift
+tags: [oci,openshift]
 ---
 In this post, I want to share my experiences with running OpenShift on Oracle 
 Cloud Infrastructure (OCI).  This is not strictly a "how to" because I did 

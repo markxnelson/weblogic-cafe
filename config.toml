@@ -11,3 +11,9 @@ relativeURLs = true
 [params]
   featured_image = "/images/cafe.jpg"
   body_classes = "avenir bg-near-white"
+  twitter = "https://twitter.com/markxnelson"
+  linkedin = "https://www.linkedin.com/in/marknelson6/"
+  github = "https://github.com/markxnelson"
+
+[taxonomies]
+  tag = "tags"
