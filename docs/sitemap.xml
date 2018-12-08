@@ -17,7 +17,14 @@
   </url>
   
   <url>
-    <loc>http://weblogic.cafe/categories/</loc>
+    <loc>http://weblogic.cafe/tags/oci/</loc>
+    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/openshift/</loc>
+    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -29,6 +36,7 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/</loc>
+    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
     <priority>0</priority>
   </url>
   
