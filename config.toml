@@ -15,6 +15,7 @@ relativeURLs = true
   linkedin = "https://www.linkedin.com/in/marknelson6/"
   github = "https://github.com/markxnelson"
   show_reading_time = true
+  favicon = "/favicon.ico"
 
 [taxonomies]
   tag = "tags"
