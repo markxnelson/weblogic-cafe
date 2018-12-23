@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Fri, 07 Dec 2018 17:00:00 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 22 Dec 2018 08:00:23 -0500</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>http://weblogic.cafe/tags/kubernetes/</link>
+      <pubDate>Sat, 22 Dec 2018 08:00:23 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/tags/kubernetes/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Oci</title>
@@ -27,6 +36,24 @@
       <pubDate>Fri, 07 Dec 2018 17:00:00 -0500</pubDate>
       
       <guid>http://weblogic.cafe/tags/openshift/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Operator</title>
+      <link>http://weblogic.cafe/tags/operator/</link>
+      <pubDate>Sat, 22 Dec 2018 08:00:23 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/tags/operator/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Weblogic</title>
+      <link>http://weblogic.cafe/tags/weblogic/</link>
+      <pubDate>Sat, 22 Dec 2018 08:00:23 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/tags/weblogic/</guid>
       <description></description>
     </item>
     

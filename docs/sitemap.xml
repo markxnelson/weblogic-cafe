@@ -22,6 +22,12 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/kubernetes/</loc>
+    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/tags/oci/</loc>
     <lastmod>2018-12-07T17:00:00-05:00</lastmod>
     <priority>0</priority>
@@ -34,6 +40,12 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/operator/</loc>
+    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/</loc>
     <lastmod>2018-12-22T08:00:23-05:00</lastmod>
     <priority>0</priority>
@@ -41,12 +53,18 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/</loc>
-    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
+    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/</loc>
+    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/weblogic/</loc>
     <lastmod>2018-12-22T08:00:23-05:00</lastmod>
     <priority>0</priority>
   </url>

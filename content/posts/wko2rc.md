@@ -2,6 +2,7 @@
 title: "WebLogic Kubernetes Operator 2.0 Release Candidate now available"
 date: 2018-12-22T08:00:23-05:00
 draft: false
+tags: [weblogic,operator,kubernetes]
 ---
 
 We have just made our 2.0 Release Candidate 1 of the [Oracle WebLogic Server
