@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/posts/spinnaker/</loc>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/wko2rc/</loc>
     <lastmod>2018-12-22T08:00:23-05:00</lastmod>
   </url>
@@ -29,7 +34,7 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/oci/</loc>
-    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -47,7 +52,13 @@
   
   <url>
     <loc>http://weblogic.cafe/posts/</loc>
-    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/spinnaker/</loc>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -59,7 +70,7 @@
   
   <url>
     <loc>http://weblogic.cafe/</loc>
-    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
     <priority>0</priority>
   </url>
   

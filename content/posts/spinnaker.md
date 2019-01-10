@@ -1,7 +1,7 @@
 ---
 title: "Oracle Cloud Infrastructure provider for Spinnaker"
 date: 2019-01-09T10:00:29-05:00
-draft: true
+draft: false
 tags: [oci,spinnaker]
 ---
 Over the last year or so, we have had a group of developers working on the
