@@ -591,6 +591,12 @@ Server binaries and the patches we need.  So we are ready to deploy it!
 ## Create the WebLogic domain 
 
 
+
+./create-weblogic-credentials.sh -u weblogic -p welcome1 -d domain1 -n weblogic
+
+./create-domain.sh -i domain1.yaml -o /root -u weblogic -p welcome1 -k
+
+
 ## Verify access to the WebLogic administration console and WLST 
 
 

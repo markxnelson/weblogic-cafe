@@ -12,7 +12,7 @@
     <meta name="generator" content="Hugo 0.42.2" />
     
     
-      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+      <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
     
 
     
@@ -40,7 +40,7 @@
 
 
 
-<meta property="og:updated_time" content="2019-01-09T10:00:29-05:00"/>
+<meta property="og:updated_time" content="2019-01-13T18:02:10-05:00"/>
 
 
 
@@ -58,9 +58,22 @@
 <meta name="twitter:title" content="WebLogic Café"/>
 <meta name="twitter:description" content=""/>
 
+      
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-129126578-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
   </head>
 
-  <body class="ma0 avenir bg-near-white">
+  <body class="ma0 avenir bg-near-white production">
 
     
 
@@ -164,6 +177,31 @@
       
       <div class="blah w-100">
         <h1 class="f3 fw1 athelas mt0 lh-title">
+          <a href="./posts/openshift-relocate-var-lib-docker/" class="color-inherit dim link">
+            Relocate the /var/lib/docker storage on an OpenShift system
+            </a>
+        </h1>
+        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
+          Today I ran out of space in the filesystem containing the /var/lib/docker directory on my OpenShift system, which meant I could not schedule any new pods (you get an error about disk pressure). So I decided I needed some more space.
+I created a new partition with parted and then I updated my /etc/fstab to include that partition, with it mounted at /var/lib/docker. Then I made a new XFS filesystem on the with this command:
+        </div>
+          <a href="./posts/openshift-relocate-var-lib-docker/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+        
+      </div>
+    </div>
+  </div>
+</article>
+
+          </div>
+        
+          <div class="relative w-100 mb4">
+            
+<article class="bb b--black-10">
+  <div class="db pv4 ph3 ph0-l no-underline dark-gray">
+    <div class="flex flex-column flex-row-ns">
+      
+      <div class="blah w-100">
+        <h1 class="f3 fw1 athelas mt0 lh-title">
           <a href="./posts/spinnaker/" class="color-inherit dim link">
             Oracle Cloud Infrastructure provider for Spinnaker
             </a>
@@ -207,37 +245,18 @@ The 2.0 release adds some significant new features including:
 
           </div>
         
-          <div class="relative w-100 mb4">
-            
-<article class="bb b--black-10">
-  <div class="db pv4 ph3 ph0-l no-underline dark-gray">
-    <div class="flex flex-column flex-row-ns">
-      
-      <div class="blah w-100">
-        <h1 class="f3 fw1 athelas mt0 lh-title">
-          <a href="./posts/openshift/" class="color-inherit dim link">
-            Running OpenShift on OCI
-            </a>
-        </h1>
-        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
-          In this post, I want to share my experiences with running OpenShift on Oracle Cloud Infrastructure (OCI). This is not strictly a &ldquo;how to&rdquo; because I did set this up as a test/development system, not a production one, so I did take a few small short cuts, but I hope that it is still helpful to share.
-I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the &ldquo;all in one&rdquo; configuration.
-        </div>
-          <a href="./posts/openshift/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
-        
-      </div>
-    </div>
-  </div>
-</article>
-
-          </div>
-        
       </section>
 
       
       <section class="w-100">
         <h1 class="f3">More</h1>
         
+        
+          <h2 class="f5 fw4 mb4 dib mr3">
+            <a href="./posts/openshift/" class="link black dim">
+              Running OpenShift on OCI
+            </a>
+          </h2>
         
           <h2 class="f5 fw4 mb4 dib mr3">
             <a href="./posts/hello/" class="link black dim">

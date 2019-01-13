@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/posts/openshift-relocate-var-lib-docker/</loc>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/spinnaker/</loc>
     <lastmod>2019-01-09T10:00:29-05:00</lastmod>
   </url>
@@ -27,6 +32,12 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/docker/</loc>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/tags/kubernetes/</loc>
     <lastmod>2018-12-22T08:00:23-05:00</lastmod>
     <priority>0</priority>
@@ -40,7 +51,7 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/openshift/</loc>
-    <lastmod>2018-12-07T17:00:00-05:00</lastmod>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -52,7 +63,7 @@
   
   <url>
     <loc>http://weblogic.cafe/posts/</loc>
-    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -64,13 +75,13 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/</loc>
-    <lastmod>2018-12-22T08:00:23-05:00</lastmod>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/</loc>
-    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
     <priority>0</priority>
   </url>
   
