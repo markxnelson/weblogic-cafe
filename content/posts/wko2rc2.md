@@ -1,7 +1,7 @@
 ---
 title: "WebLogic Kubernetes Operator 2.0 Release Candidate 2 now available"
 date: 2019-01-16T17:14:28-05:00
-draft: true
+draft: false
 tags: [weblogic,operator,kubernetes]
 ---
 
