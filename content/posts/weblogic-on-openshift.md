@@ -596,12 +596,45 @@ Server binaries and the patches we need.  So we are ready to deploy it!
 
 ./create-domain.sh -i domain1.yaml -o /root -u weblogic -p welcome1 -k
 
+oc apply -f domain.yaml
+
+oc expose service domain1-admin-server-external --port=default
+
+
 
 ## Verify access to the WebLogic administration console and WLST 
 
+{{< figure src="/images/wls-on-os006.png" caption="Viewing the test application in the WebLogic admin console" >}}
 
-## Deploy a test application into the cluster 
 
+{{< figure src="/images/wls-on-os007.png" caption="Viewing the managed servers in the WebLogic admin console" >}}
+
+
+```
+~/wls/oracle_common/common/bin/wlst.sh
+
+Initializing WebLogic Scripting Tool (WLST) ...
+
+Jython scans all the jar files it can find at first startup. Depending on the system, this process may take a few minutes to complete, and WLST may not return a prompt right away.
+
+Welcome to WebLogic Server Administration Scripting Shell
+
+Type help() for help on available commands
+
+wls:/offline> connect('weblogic','welcome1','t3://openshift:30012')
+Connecting to t3://openshift:30012 with userid weblogic ...
+Successfully connected to Admin Server "admin-server" that belongs to domain "domain1".
+
+Warning: An insecure protocol was used to connect to the server.
+To ensure on-the-wire security, the SSL port or Admin port should be used instead.
+
+wls:/domain1/serverConfig/> ls('Servers')
+dr--   admin-server
+dr--   managed-server-1
+dr--   managed-server-2
+
+wls:/domain1/serverConfig/>
+```
 
 ## Set up a route to expose the application publicly
 
