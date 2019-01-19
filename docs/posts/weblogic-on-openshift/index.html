@@ -61,7 +61,7 @@ I am going to use the operator to manage my domains in OpenShift. The operator p
 
 <meta itemprop="datePublished" content="2019-01-19T08:30:16-05:00" />
 <meta itemprop="dateModified" content="2019-01-19T08:30:16-05:00" />
-<meta itemprop="wordCount" content="4320">
+<meta itemprop="wordCount" content="4338">
 
 
 
@@ -166,7 +166,7 @@ if (!doNotTrack) {
       
       
         <span class="f6 mv4 dib tracked"> - About 21 minutes reading time</span>
-        <span class="f6 mv4 dib tracked"> - 4320 words</span>
+        <span class="f6 mv4 dib tracked"> - 4338 words</span>
       
     </header>
 
@@ -207,9 +207,8 @@ open source and supported by Oracle.</p>
 <li>Create the WebLogic domain,</li>
 <li>Verify access to the WebLogic administration console and WLST,</li>
 <li>Deploy a test application into the cluster,</li>
-<li>Set up a route to expose the application publicly,</li>
-<li>Test scaling and load balancing, and</li>
-<li>Install the WebLogic Exporter to get metrics into Prometheus.</li>
+<li>Set up a route to expose the application publicly, and</li>
+<li>Test scaling and load balancing.</li>
 </ul>
 
 <p>Before we get started, you should clone the WebLogic operator project
@@ -293,7 +292,7 @@ Docker Hub.  You can review details of the image in the
 <p>You can use the following command to pull the image.  You may need to <code>docker login</code>
 first if you have not previously done so:</p>
 
-<pre><code>docker pull oracle/weblogic-kubernetes-operator:2.0
+<pre><code>docker pull oracle/weblogic-kubernetes-operator:2.0-rc2
 </code></pre>
 
 <p>Instead of pulling the image and manually copying it onto our OpenShift nodes,
@@ -329,7 +328,7 @@ ensure you have the <a href="https://github.com/oracle/weblogic-kubernetes-opera
 prerequisites</a> installed, and then run these commands:</p>
 
 <pre><code>mvn clean install 
-docker build -t weblogic-kubernetes-operator:2.0 --build-arg VERSION=2.0 .
+docker build -t weblogic-kubernetes-operator:2.0-rc2 --build-arg VERSION=2.0-rc2 .
 </code></pre>
 
 <h2 id="install-the-elastic-stack">Install the Elastic stack</h2>
@@ -1285,6 +1284,61 @@ control of the operator.  We have seen how we can access the admin console,
 how to use WSLT, how to set up load balancing and expose applications outside
 the OpenShift cluster, and how to control scaling.</p>
 
+<p>Here are a few screenshots from the OpenShift console showing what we have
+done:</p>
+
+<p>
+<figure>
+    
+        <img src="../../images/wls-on-os008.png" alt="The overview page" />
+    
+    
+    <figcaption>
+        <p>
+        The overview page
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os009.png" alt="Drilling down to the admin server pod" />
+    
+    
+    <figcaption>
+        <p>
+        Drilling down to the admin server pod
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os010.png" alt="The monitoring page" />
+    
+    
+    <figcaption>
+        <p>
+        The monitoring page
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+</p>
+
 <p>In future posts I will look in more detail at related topics like using a
 CI/CD pipeline to drive image creation, exporting WebLogic metrics to
 Prometheus, and more.</p>
@@ -1374,7 +1428,7 @@ Prometheus, and more.</p>
     <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
   <div class="flex justify-between">
   <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://weblogic.cafe/" >
-    &copy; 2019 Mark Nelson 
+    &copy; 2018 - 2019 Mark Nelson 
   </a>
     <div>
 
