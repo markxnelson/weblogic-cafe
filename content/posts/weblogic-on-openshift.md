@@ -32,9 +32,8 @@ Here's an overview of the process I am going to walk through:
 * Create the WebLogic domain, 
 * Verify access to the WebLogic administration console and WLST, 
 * Deploy a test application into the cluster, 
-* Set up a route to expose the application publicly,
-* Test scaling and load balancing, and
-* Install the WebLogic Exporter to get metrics into Prometheus.
+* Set up a route to expose the application publicly, and
+* Test scaling and load balancing.
 
 Before we get started, you should clone the WebLogic operator project 
 from GitHub.  It contains many of the samples and helpers we will need.
@@ -73,7 +72,7 @@ You can use the following command to pull the image.  You may need to `docker lo
 first if you have not previously done so:
 
 ```
-docker pull oracle/weblogic-kubernetes-operator:2.0
+docker pull oracle/weblogic-kubernetes-operator:2.0-rc2
 ```
 
 Instead of pulling the image and manually copying it onto our OpenShift nodes, 
@@ -112,7 +111,7 @@ prerequisites](https://github.com/oracle/weblogic-kubernetes-operator/blob/maste
 
 ```
 mvn clean install 
-docker build -t weblogic-kubernetes-operator:2.0 --build-arg VERSION=2.0 .
+docker build -t weblogic-kubernetes-operator:2.0-rc2 --build-arg VERSION=2.0-rc2 .
 ```
 
 ## Install the Elastic stack 
@@ -851,6 +850,13 @@ configuration and applications deployed, running on OpenShift under the
 control of the operator.  We have seen how we can access the admin console,
 how to use WSLT, how to set up load balancing and expose applications outside
 the OpenShift cluster, and how to control scaling.
+
+Here are a few screenshots from the OpenShift console showing what we have
+done:
+
+{{< figure src="/images/wls-on-os008.png" caption="The overview page" >}}
+{{< figure src="/images/wls-on-os009.png" caption="Drilling down to the admin server pod" >}}
+{{< figure src="/images/wls-on-os010.png" caption="The monitoring page" >}}
 
 In future posts I will look in more detail at related topics like using a 
 CI/CD pipeline to drive image creation, exporting WebLogic metrics to 
