@@ -1,13 +1,22 @@
 ---
 title: "WebLogic on OpenShift"
-date: 2019-01-11T08:30:16-05:00
-draft: true
+date: 2019-01-19T08:30:16-05:00
+draft: false
 toc: true
 tags: [weblogic,openshift]
 ---
 In this post I am going to walk through setting up and using WebLogic on 
 OpenShift, using the [Oracle WebLogic Server Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).  My starting point is the OpenShift Container Platform server 
 that I set up on OCI in [this earlier post](/posts/openshift).
+
+I am going to use the operator to manage my domains in OpenShift.  The operator
+pattern is common in Kubernetes for managing complex software products that 
+have special lifecycle requirements, different to the base assumptions made
+by Kubernetes.  For example, when there is state in a pod that needs to be 
+saved or migrated before terminating a pod.  The WebLogic Kubernetes operator 
+includes such built-in knowledge of WebLogic, so it greatly simplifies the
+management of WebLogic in a Kubernetes environment.  Plus it is completely
+open source and supported by Oracle.
 
 ## Overview
 
@@ -36,7 +45,7 @@ git clone https://github.com/oracle/weblogic-kubernetes-operator
 ## Create a new project (namespace) 
 
 In the OpenShift web user interface, create a new project.  If you already 
-have other prjects, go to the Application Console, and then click on the 
+have other projects, go to the Application Console, and then click on the 
 project pulldown at the top and click on "View All Projects" and then the 
 "Create Project" button.  If you don't have existing projects, OpenShift 
 will take you right to the create project page when you log in.  I called
@@ -53,12 +62,13 @@ below:
 ## Prepare the project for the WebLogic Kubernetes Operator 
 
 The easiest way to get the operator Docker image is to just pull it from the 
-Docker Store.  You can review details of the image in the 
-[Docker Store](https://hub.docker.com/r/oracle/weblogic-kubernetes-operator).
+Docker Hub.  You can review details of the image in the 
+[Docker Hub](https://hub.docker.com/r/oracle/weblogic-kubernetes-operator).
 
-{{< figure src="/images/wls-on-os003.png" caption="The WebLogic Kubernetes Operator in the Docker Store" >}}
+{{< figure src="/images/wls-on-os003.png" caption="The WebLogic Kubernetes Operator in the Docker Hub" >}}
 
-You can use the following command to pull the image:
+You can use the following command to pull the image.  You may need to `docker login` 
+first if you have not previously done so:
 
 ```
 docker pull oracle/weblogic-kubernetes-operator:2.0
@@ -67,7 +77,7 @@ docker pull oracle/weblogic-kubernetes-operator:2.0
 Instead of pulling the image and manually copying it onto our OpenShift nodes, 
 we could also just add an Image Pull Secret to our project (namespace) so 
 that OpenShift will be able to pull the image for us.  We can do this
-with the following commands (at this stage we are using a user with `cluster-admin`):
+with the following commands (at this stage we are using a user with the `cluster-admin` role):
 
 ```
 oc project weblogic
@@ -80,7 +90,7 @@ oc create secret docker-registry docker-store-secret \
 
 In this command, replace `DOCKER_USER` with your Docker store userid, 
 `DOCKER_PASSWORD` with your password, and `DOCKER_EMAIL` with the email
-address associated with your Docker Store account. 
+address associated with your Docker Hub account. 
 
 We also need to tell OpenShift to link this secret to our service account.
 Assuming we want to use the `default` service account in our `weblogic` 
@@ -93,7 +103,7 @@ oc secrets link default docker-store-secret --for=pull
 ## (Optional) Build the image yourself
 
 It is also possible to build the image yourself, rather than pulling it 
-from Docker Store.  If you want to do that, first go to Docker Store and 
+from Docker Hub.  If you want to do that, first go to Docker Hub and 
 accept the license for the [Server JRE image](https://hub.docker.com/_/oracle-serverjre-8), 
 ensure you have the [listed 
 prerequisites](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/user-guide.md#prerequisites) installed, and then run these commands:
@@ -103,7 +113,7 @@ mvn clean install
 docker build -t weblogic-kubernetes-operator:2.0 --build-arg VERSION=2.0 .
 ```
 
-## Install the ELK stack 
+## Install the Elastic stack 
 
 The operator can optionally send its logs to Elasticsearch and Kibana.
 This provides a nice way to view the logs, and to search and filter and so on,
@@ -116,7 +126,7 @@ kubernetes/samples/scripts/elasticsearch-and-kibana/elasticsearch_and_kibana.yam
 ```
 
 Edit this file to set the namespace to "weblogic" for each deployment and 
-service (i.e. on lines 30, 55, 74 and 98 (just search for `namespace`) 
+service (i.e. on lines 30, 55, 74 and 98 - just search for `namespace`) 
 and then install them using this command: 
 
 ```
@@ -150,7 +160,7 @@ Helm provide [installation instructions](https://github.com/kubernetes/helm/blob
 on their site.  I just downloaded the latest [release](https://github.com/helm/helm/archive/v2.12.1.zip),
 unzipped it, and made `helm` executable.
 
-Before we install tiller, let's create a cluster role binding to make sure the 
+Before we install Tiller, let's create a cluster role binding to make sure the 
 `default` service account in the `kube-system` namespace (which tiller will run
 under) has the `cluster-admin` role, which it will need to install and manage
 the operation. 
@@ -182,7 +192,7 @@ tiller-deploy                1         1         1            1           18s
 ```
 
 When you install the operator you can either pass the configuration parameters
-into helm on the command line, or if you prefer, you can store them in a YAML
+into Helm on the command line, or if you prefer, you can store them in a YAML
 file and pass that file in.  I like to store them in a file.  There is a 
 sample provided, so we can just make a copy and update it with our details.
 
@@ -192,7 +202,7 @@ cp kubernetes/charts/weblogic-operator/values.yaml my-operator-values.yaml
 
 Here are the updates we need to make: 
 
-* Set the `domainNamespaces` paraemeter to include just `weblogic`, i.e. the
+* Set the `domainNamespaces` parameter to include just `weblogic`, i.e. the
   project (namespace) that we created to install WebLogic in. 
 
 {{< highlight bash "linenos=table,hl_lines=2,linenostart=19" >}}
@@ -201,7 +211,7 @@ domainNamespaces:
 {{< / highlight >}}
 
 * Set the `image` parameter to match the name of the image you pulled from 
-  Docker Store or built yourself.  If you just create the image pull secret
+  Docker Hub or built yourself.  If you just create the image pull secret
   then use the value I have shown here: 
 
 {{< highlight bash "linenos=table,hl_lines=2,linenostart=22" >}}
@@ -220,7 +230,7 @@ imagePullSecrets:
 * Set the `elkIntegrationEnabled` parameter to `true`.
 
 {{< highlight bash "linenos=table,hl_lines=2,linenostart=90" >}}
-# elkIntegrationEnabled specifies whether or not ELK integration is enabled.
+# elkIntegrationEnabled specifies whether or not Elastic integration is enabled.
 elkIntegrationEnabled: true
 {{< / highlight >}}
 
@@ -233,7 +243,7 @@ elkIntegrationEnabled: true
 elasticSearchHost: "elasticsearch.weblogic.svc.cluster.local"
 {{< / highlight >}}
 
-Now we can use helm to install the operator with this command, notice
+Now we can use helm to install the operator with this command. Notice
 that I pass in the name of my parameters YAML file in the `--values` option:
 
 ```
@@ -246,7 +256,7 @@ helm install kubernetes/charts/weblogic-operator \
 
 This command will wait until the operator starts up successfully.  If it has
 to pull the image, that will obviously take a little while, but if this command
-does not finish in say a minute or so, then it is probably stuck.  You can 
+does not finish in a minute or so, then it is probably stuck.  You can 
 send it to the background and start looking around to see what went wrong.
 Most often it will be a problem pulling the image.  If you see the pod has
 status `ImagePullBackOff` then OpenShift was not able to pull the image. 
@@ -336,13 +346,12 @@ The easiest way to get the base image is to grab it from Oracle using
 this command:
 
 ```
-docker pull waiting-for-details-from-monica
+docker pull store/oracle/weblogic:12.2.1.3
 ```
 
-Of course, you could also take the standard 
-[WebLogic Server 12.2.1.3.0](https://hub.docker.com/_/oracle-weblogic-server-12c) 
-image from Docker Store and then install the patches on top of that.  This is 
-worth knowing how to do, in case you need some additional one-off patches.
+The standard [WebLogic Server 12.2.1.3.0](https://hub.docker.com/_/oracle-weblogic-server-12c) 
+image from Docker Hub has the necessary patches already installed.  It is 
+worth knowing how to install patches, in case you need some additional one-off patches.
 If you are not interested in that, skip forward to 
 [here](#creating-the-image-with-the-domain-in-it).
 
@@ -358,8 +367,8 @@ container, apply it, and then remove the temporary files after you are done.
 # Install patches to run WebLogic on Kubernetes
 # ---------------------------------------------
 
-# Start with the standard WebLogic 12.2.1.3.0 Docker image
-FROM store/oracle/weblogic:12.2.1.3
+# Start with an unpatched WebLogic 12.2.1.3.0 Docker image
+FROM your/weblogic-image:12.2.1.3
 
 MAINTAINER Mark Nelson <mark.x.nelson@oracle.com>
 
@@ -405,8 +414,7 @@ RUN cd /u01 && \
     rm /u01/$PATCH_PKG3 && \
     rm -rf /u01/6880880 && \
     rm -rf /u01/28298734 && \
-    rm -rf /u01/29135930 && \
-    rm -rf /u01/oracle/cfgtoollogs/opatch/*
+    rm -rf /u01/29135930 
 
 WORKDIR ${ORACLE_HOME}
 
@@ -422,23 +430,6 @@ with this command:
 docker build -t my-weblogic-base-image:12.2.1.3.0 .
 ```
 
-Take special note of that last line: 
-
-```
-rm -rf /u01/oracle/cfgtoollogs/opatch/*
-```
-
-If you include that line, it will remove the backups created
-by OPatch when applying the patches.  In the case of a PSU, these 
-backups can consume a significant amount of space.  Removing them does two 
-things - first, it will reduce the size of the resulting image, which is a 
-good thing; but second, it will make the resulting image unpatchable - you 
-won't be able to apply
-any more patches to it, or remove any that are already there.  This is not 
-a problem if you are going to build new images every time you want to 
-change you selection of patches.  If you want to maintain the ability 
-to patch that image, just take out that line.
-
 ### Creating the image with the domain in it
 
 I am going to use the [WebLogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling)
@@ -446,7 +437,7 @@ to define my domain.  If you are not familiar with this tool, you might
 want to check it out!  It lets you define your domain declaratively instead
 of writing custom WLST scripts.  For just one domain, maybe not such a big 
 deal, but if you need to create a lot of domains it is pretty useful.  It 
-also lets you paramaterize them, and it can introspect existing domains to 
+also lets you parameterize them, and it can introspect existing domains to 
 create a model and associated artifacts.  You can also use it to "move" 
 domains from place to place, say from an on-premises install to Kubernetes,
 and you can change the version of WebLogic on the way without needing to worry
@@ -466,12 +457,15 @@ image that we will tag `my-domain1-image:1.0`:
 git clone https://github.com/markxnelson/simple-sample-domain
 cd simple-sample-domain
 curl -Lo weblogic-deploy.zip https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-0.14/weblogic-deploy.zip
+# make sure JAVA_HOME is set correctly, and `mvn` is on your PATH
 ./build-archive.sh
 ./quickBuild.sh
 ```
 
 I won't go into all the nitty gritty details of how this works, that's a 
-subject for another post, but take a look at the `simple-toplogy.yaml` file
+subject for another post (if you are interested, take a look at the documentation
+in the [GitHub project](https://github.com/oracle/weblogic-deploy-tooling)), 
+but take a look at the `simple-toplogy.yaml` file
 to get a feel for what is happening:
 
 {{< highlight bash "linenos=table" >}}
@@ -590,25 +584,131 @@ Server binaries and the patches we need.  So we are ready to deploy it!
 
 ## Create the WebLogic domain 
 
+First, we need to create a Kubernetes secret with the WebLogic credentials 
+in it.  This is used by the operator to start the domain.  You can use the 
+sample provided [here](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/scripts/create-weblogic-domain-credentials) to create the secret:
 
+```
+./create-weblogic-credentials.sh \
+   -u weblogic \
+   -p welcome1 \
+   -d domain1 \
+   -n weblogic
+```
 
-./create-weblogic-credentials.sh -u weblogic -p welcome1 -d domain1 -n weblogic
+Next, we need to create the domain custom resource.  To do this, we prepare 
+a Kubernetes YAML file as follows.  I have removed the comments to make this
+more readable, you can find a sample [here](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/kubernetes/samples/scripts/create-weblogic-domain/manually-create-domain/domain.yaml)
+which has extensive comments to explain how to create these files:
 
-./create-domain.sh -i domain1.yaml -o /root -u weblogic -p welcome1 -k
+{{< highlight yaml "linenos=table" >}}
+apiVersion: "weblogic.oracle/v2"
+kind: Domain
+metadata:
+  name: domain1
+  namespace: weblogic
+  labels:
+    weblogic.resourceVersion: domain-v2
+    weblogic.domainUID: domain1
+spec:
+  domainHome: /u01/oracle/user_projects/domains/domain1
+  domainHomeInImage: true
+  image: "my-domain1-image:1.0"
+  imagePullPolicy: "IfNotPresent"
+  webLogicCredentialsSecret: 
+    name: domain1-weblogic-credentials
+  includeServerOutInPodLog: true
+  serverStartPolicy: "IF_NEEDED"
+  serverPod:
+    annotations: 
+      openshift.io/scc: anyuid
+    env:
+    - name: JAVA_OPTIONS
+      value: "-Dweblogic.StdoutDebugEnabled=false"
+    - name: USER_MEM_ARGS
+      value: "-Xms64m -Xmx256m "
+  adminServer:
+    serverStartState: "RUNNING"
+    adminService:
+      channels:
+       - channelName: default
+         nodePort: 30701
+       - channelName: T3Channel
+  clusters:
+  - clusterName: cluster-1
+    serverStartState: "RUNNING"
+    replicas: 2
+{{< / highlight >}}
 
+Now we can use this file to create the domain custom resource, using the
+following command: 
+
+```
 oc apply -f domain.yaml
+```
 
+You can verify it was created, and view the resource that was created with
+these commands:
+
+```
+oc get domains
+oc describe domain domain1
+```
+
+The operator will notice this new domain custom resource and it will react
+accordingly.  In this case, since we have asked for the admin server and
+the servers in the the cluster to come to the "RUNNING" state (in lines 27
+and 25 above) the operator will start up the admin server first, and then
+both managed servers.  You can watch this happen using this command:
+
+```
+oc get pods -w
+```
+
+This will print out the current pods, and then update every time there is
+a change in status.  You can hit Ctrl-C to exit from the command when you 
+have seen enough. 
+
+The operator also creates services for the admin server, each managed server
+and the cluster.  You can see the services with this command:
+
+```
+oc get services
+```
+
+You will notice a service called `domain1-admin-server-external` which is
+used to expose the admin server's default channel outside of the cluster,
+to allow us to access the admin console and to use WLST.  We need to tell
+OpenShift to make this service available externally by creating a route
+with this command:
+
+```
 oc expose service domain1-admin-server-external --port=default
+```
 
-
+This will expose that service on the `NodePort` it declared.
 
 ## Verify access to the WebLogic administration console and WLST 
 
+Now you can start a browser and point it to any one of your worker nodes
+and use the `NodePort` from the service (`30701` in the example above) to
+access the admin console.  For me, since I have an entry in my `/etc/hosts`
+for my OpenShift server, this address is `http://openshift:30701/console`.
+
+You can log in to the admin console and use it as normal.  You might like
+to navigate into "Deployments" to verify that our web application is there:
+
 {{< figure src="/images/wls-on-os006.png" caption="Viewing the test application in the WebLogic admin console" >}}
 
+You might also like to go to the "Server" page to validate that you can see
+all of the managed servers:
 
 {{< figure src="/images/wls-on-os007.png" caption="Viewing the managed servers in the WebLogic admin console" >}}
 
+We can also use WLST against the domain, if desired.  To do this, just 
+start up WLST as normal on your client machine and then use the OpenShift
+server address and the `NodePort` to form the `t3` URL. Using the example
+above, my URL is `t3://openshift:30701`:
 
 ```
 ~/wls/oracle_common/common/bin/wlst.sh
@@ -621,8 +721,8 @@ Welcome to WebLogic Server Administration Scripting Shell
 
 Type help() for help on available commands
 
-wls:/offline> connect('weblogic','welcome1','t3://openshift:30012')
-Connecting to t3://openshift:30012 with userid weblogic ...
+wls:/offline> connect('weblogic','welcome1','t3://openshift:30701')
+Connecting to t3://openshift:30701 with userid weblogic ...
 Successfully connected to Admin Server "admin-server" that belongs to domain "domain1".
 
 Warning: An insecure protocol was used to connect to the server.
@@ -636,13 +736,120 @@ dr--   managed-server-2
 wls:/domain1/serverConfig/>
 ```
 
+You can use WLST as normal, either interactively, or you can run scripts.
+Keep in mind though, that since you have your domain burnt into the image, 
+when you restart the pods, any changes you made with WLST would be lost.
+If you want to make permanent changes, you would need to include the WLST
+scripts in the image building process and then re-run it to build a new
+version of the image. 
+
+Of course, if you have chosen to put your domain in peristent storage instead
+of burning it into the image, this caveat would not apply.
+
+
 ## Set up a route to expose the application publicly
 
+Now, let's expose our web application outside the OpenShift cluster.  To
+do this, we are going to want to set up a load balancer to distribute
+requests across all of the managed servers, and then expose the load 
+balancer endpoint.
+
+We can use the provided [sample](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/charts/traefik)
+to install the Traefik load balancer using the following command:
+
+```
+helm install stable/traefik \
+     --name traefik-operator \
+     --namespace traefik \
+     --values kubernetes/samples/charts/traefik/values.yaml  \
+     --set "kubernetes.namespaces={traefik,weblogic}" \
+     --wait
+```
+
+Make sure you include the `weblogic` namespace so the Traefik ingress 
+controller knows to load balance ingresses in our namespace.
+
+Next, we need to create the ingress object.  We can also do this with the
+provided [sample](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/charts/ingress-per-domain)
+using this command:
+
+```
+helm install kubernetes/samples/charts/ingress-per-domain \
+     --name domain1-ingress \
+     --namespace weblogic \
+     --set wlsDomain.domainUID=domain1 \
+     --set traefik.hostname=domain1.org
+```
+
+Note that you would set the hostname to your real DNS hostname when you do
+this for real.  In this example, I am just using a made up hostname.
 
 ## Test scaling and load balancing
 
+Now we can hit the web application to verify the load balancing is working.
+You can hit it from a browser, but in that case session affinity will kick
+in, so you will likely see a response from the same managed server over and 
+over again.  If you use `curl` though, you should see it round robin. 
 
-## Install the WebLogic Exporter to get metrics into Prometheus
+You can run curl in a loop using this command:
 
+```
+while true
+do
+  sleep 2
+  curl -v -H 'host: domain1.org' http://openshift:30305/testwebapp/
+done
+```
 
+The web application just prints out the name and IP address of the managed
+server.  So you should see the output alternate between all of the managed 
+servers in sequence.
 
+Now, let's scale the cluster down and see what happens.  To initiate scaling,
+we can just edit the domain custom resource with this command:
+
+```
+oc edit domain domain1
+```
+
+This will open the domain custom resource in an editor.  Find the entry
+for `cluster-1` and underneath that the `replicas` entry:
+
+```
+  clusters:
+  - clusterName: cluster-1
+    clusterService:
+      annotations: {}
+      labels: {}
+    replicas: 4
+```
+
+You can change the `replicas` to another value, for example `2`, and then
+save and exit.  The operator will notice this change and will react by 
+gracefully shutting down two of the managed servers.  You can watch this
+happen with the command:
+
+```
+oc get pods -w
+```
+
+You will also notice in the other window where you have `curl` running that
+those two managed servers no longer get requests.  You will also notice that
+there are not failed requests - the servers are removed from the `domain1-cluster-cluster-1`
+service early so they will not receive requests and lead to a connection refused
+or timeout.  The ingress and the load balancer automatically adjust. 
+
+Once the scaling is finished, you might want to scale back up to `4` and
+watch the operation in reverse.
+
+## Conclusion
+
+Well at this point we have our custom WebLogic domain, with our own 
+configuration and applications deployed, running on OpenShift under the 
+control of the operator.  We have seen how we can access the admin console,
+how to use WSLT, how to set up load balancing and expose applications outside
+the OpenShift cluster, and how to control scaling.
+
+In future posts I will look in more detail at related topics like using a 
+CI/CD pipeline to drive image creation, exporting WebLogic metrics to 
+Prometheus, and more. 

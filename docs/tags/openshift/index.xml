@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Sun, 13 Jan 2019 18:02:10 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 19 Jan 2019 08:30:16 -0500</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/tags/openshift/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>WebLogic on OpenShift</title>
+      <link>http://weblogic.cafe/posts/weblogic-on-openshift/</link>
+      <pubDate>Sat, 19 Jan 2019 08:30:16 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/posts/weblogic-on-openshift/</guid>
+      <description>In this post I am going to walk through setting up and using WebLogic on OpenShift, using the Oracle WebLogic Server Kubernetes Operator. My starting point is the OpenShift Container Platform server that I set up on OCI in this earlier post.
+I am going to use the operator to manage my domains in OpenShift. The operator pattern is common in Kubernetes for managing complex software products that have special lifecycle requirements, different to the base assumptions made by Kubernetes.</description>
+    </item>
     
     <item>
       <title>Relocate the /var/lib/docker storage on an OpenShift system</title>

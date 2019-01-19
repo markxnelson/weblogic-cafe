@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>WebLogic Café  | WebLogic on OpenShift</title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.42.2" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+    
+
+    
+    
+      <link href="../../dist/css/app.e08a958ae3e530145318b6373195c765.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon" />
+
+    
+
+    
+
+    <meta property="og:title" content="WebLogic on OpenShift" />
+<meta property="og:description" content="In this post I am going to walk through setting up and using WebLogic on OpenShift, using the Oracle WebLogic Server Kubernetes Operator. My starting point is the OpenShift Container Platform server that I set up on OCI in this earlier post.
+I am going to use the operator to manage my domains in OpenShift. The operator pattern is common in Kubernetes for managing complex software products that have special lifecycle requirements, different to the base assumptions made by Kubernetes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://weblogic.cafe/posts/weblogic-on-openshift/" />
+
+
+
+<meta property="article:published_time" content="2019-01-19T08:30:16-05:00"/>
+
+<meta property="article:modified_time" content="2019-01-19T08:30:16-05:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="WebLogic on OpenShift">
+<meta itemprop="description" content="In this post I am going to walk through setting up and using WebLogic on OpenShift, using the Oracle WebLogic Server Kubernetes Operator. My starting point is the OpenShift Container Platform server that I set up on OCI in this earlier post.
+I am going to use the operator to manage my domains in OpenShift. The operator pattern is common in Kubernetes for managing complex software products that have special lifecycle requirements, different to the base assumptions made by Kubernetes.">
+
+
+<meta itemprop="datePublished" content="2019-01-19T08:30:16-05:00" />
+<meta itemprop="dateModified" content="2019-01-19T08:30:16-05:00" />
+<meta itemprop="wordCount" content="4308">
+
+
+
+<meta itemprop="keywords" content="weblogic,openshift," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WebLogic on OpenShift"/>
+<meta name="twitter:description" content="In this post I am going to walk through setting up and using WebLogic on OpenShift, using the Oracle WebLogic Server Kubernetes Operator. My starting point is the OpenShift Container Platform server that I set up on OCI in this earlier post.
+I am going to use the operator to manage my domains in OpenShift. The operator pattern is common in Kubernetes for managing complex software products that have special lifecycle requirements, different to the base assumptions made by Kubernetes."/>
+
+      
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-129126578-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+  </head>
+
+  <body class="ma0 avenir bg-near-white production">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="http://weblogic.cafe/" class="f3 fw2 hover-white no-underline white-90 dib">
+      WebLogic Café
+    </a>
+    <div class="flex-l items-center">
+      
+        <ul class="pl0 mr3">
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="../../about/" title="About page">
+              About
+            </a>
+          </li>
+          
+        </ul>
+      
+      
+
+
+
+  <a href="https://twitter.com/markxnelson" class="link-transition twitter link dib z-999 pt3 pt0-l mr2" title="Twitter link">
+    <svg height="32px"  style="enable-background:new 0 0 67 67;" version="1.1" viewBox="0 0 67 67" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M37.167,22.283c-2.619,0.953-4.274,3.411-4.086,6.101  l0.063,1.038l-1.048-0.127c-3.813-0.487-7.145-2.139-9.974-4.915l-1.383-1.377l-0.356,1.017c-0.754,2.267-0.272,4.661,1.299,6.271  c0.838,0.89,0.649,1.017-0.796,0.487c-0.503-0.169-0.943-0.296-0.985-0.233c-0.146,0.149,0.356,2.076,0.754,2.839  c0.545,1.06,1.655,2.097,2.871,2.712l1.027,0.487l-1.215,0.021c-1.173,0-1.215,0.021-1.089,0.467  c0.419,1.377,2.074,2.839,3.918,3.475l1.299,0.444l-1.131,0.678c-1.676,0.976-3.646,1.526-5.616,1.568  C19.775,43.256,19,43.341,19,43.405c0,0.211,2.557,1.397,4.044,1.864c4.463,1.377,9.765,0.783,13.746-1.568  c2.829-1.673,5.657-5,6.978-8.221c0.713-1.716,1.425-4.851,1.425-6.354c0-0.975,0.063-1.102,1.236-2.267  c0.692-0.678,1.341-1.419,1.467-1.631c0.21-0.403,0.188-0.403-0.88-0.043c-1.781,0.636-2.033,0.551-1.152-0.402  c0.649-0.678,1.425-1.907,1.425-2.267c0-0.063-0.314,0.042-0.671,0.233c-0.377,0.212-1.215,0.53-1.844,0.72l-1.131,0.361l-1.027-0.7  c-0.566-0.381-1.361-0.805-1.781-0.932C39.766,21.902,38.131,21.944,37.167,22.283z M33,64C16.432,64,3,50.569,3,34S16.432,4,33,4  s30,13.431,30,30S49.568,64,33,64z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/></svg>
+
+  </a>
+
+
+
+
+  <a href="https://www.linkedin.com/in/marknelson6/" class="link-transition linkedin link dib z-999 pt3 pt0-l mr2" title="LinkedIn link">
+    <svg  height="32px"  style="enable-background:new 0 0 65 65;" version="1.1" viewBox="0 0 65 65" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M50.837,48.137V36.425c0-6.275-3.35-9.195-7.816-9.195  c-3.604,0-5.219,1.983-6.119,3.374V27.71h-6.79c0.09,1.917,0,20.427,0,20.427h6.79V36.729c0-0.609,0.044-1.219,0.224-1.655  c0.49-1.22,1.607-2.483,3.482-2.483c2.458,0,3.44,1.873,3.44,4.618v10.929H50.837z M22.959,24.922c2.367,0,3.842-1.57,3.842-3.531  c-0.044-2.003-1.475-3.528-3.797-3.528s-3.841,1.524-3.841,3.528c0,1.961,1.474,3.531,3.753,3.531H22.959z M34,64  C17.432,64,4,50.568,4,34C4,17.431,17.432,4,34,4s30,13.431,30,30C64,50.568,50.568,64,34,64z M26.354,48.137V27.71h-6.789v20.427  H26.354z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/>
+</svg>
+
+  </a>
+
+
+  <a href="https://github.com/markxnelson" class="link-transition github link dib z-999 pt3 pt0-l mr2" title="Github link">
+    <svg  height="32px"  style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" >
+  <path d="M256,32C132.3,32,32,134.8,32,261.7c0,101.5,64.2,187.5,153.2,217.9c11.2,2.1,15.3-5,15.3-11.1   c0-5.5-0.2-19.9-0.3-39.1c-62.3,13.9-75.5-30.8-75.5-30.8c-10.2-26.5-24.9-33.6-24.9-33.6c-20.3-14.3,1.5-14,1.5-14   c22.5,1.6,34.3,23.7,34.3,23.7c20,35.1,52.4,25,65.2,19.1c2-14.8,7.8-25,14.2-30.7c-49.7-5.8-102-25.5-102-113.5   c0-25.1,8.7-45.6,23-61.6c-2.3-5.8-10-29.2,2.2-60.8c0,0,18.8-6.2,61.6,23.5c17.9-5.1,37-7.6,56.1-7.7c19,0.1,38.2,2.6,56.1,7.7   c42.8-29.7,61.5-23.5,61.5-23.5c12.2,31.6,4.5,55,2.2,60.8c14.3,16.1,23,36.6,23,61.6c0,88.2-52.4,107.6-102.3,113.3   c8,7.1,15.2,21.1,15.2,42.5c0,30.7-0.3,55.5-0.3,63c0,6.1,4,13.3,15.4,11C415.9,449.1,480,363.1,480,261.7   C480,134.8,379.7,32,256,32z"/>
+</svg>
+
+  </a>
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3 ph0-l">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">WebLogic on OpenShift</h1>
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-01-19T08:30:16-05:00">January 19, 2019</time>      
+      
+      
+        <span class="f6 mv4 dib tracked"> - About 21 minutes reading time</span>
+        <span class="f6 mv4 dib tracked"> - 4308 words</span>
+      
+    </header>
+
+    <main class="nested-copy-line-height lh-copy f5 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><ul class="pa0">
+  
+     <a href="../../tags/weblogic" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">weblogic</a>
+  
+     <a href="../../tags/openshift" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">openshift</a>
+  
+</ul>
+
+
+<p>In this post I am going to walk through setting up and using WebLogic on
+OpenShift, using the <a href="https://github.com/oracle/weblogic-kubernetes-operator">Oracle WebLogic Server Kubernetes Operator</a>.  My starting point is the OpenShift Container Platform server
+that I set up on OCI in <a href="../../posts/openshift">this earlier post</a>.</p>
+
+<p>I am going to use the operator to manage my domains in OpenShift.  The operator
+pattern is common in Kubernetes for managing complex software products that
+have special lifecycle requirements, different to the base assumptions made
+by Kubernetes.  For example, when there is state in a pod that needs to be
+saved or migrated before terminating a pod.  The WebLogic Kubernetes operator
+includes such built-in knowledge of WebLogic, so it greatly simplifies the
+management of WebLogic in a Kubernetes environment.  Plus it is completely
+open source and supported by Oracle.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>Here&rsquo;s an overview of the process I am going to walk through:</p>
+
+<ul>
+<li>Create a new project (namespace) where I will be deploying WebLogic,</li>
+<li>Prepare the project for the WebLogic Kubernetes Operator,</li>
+<li>Install the operator,</li>
+<li>View the operator logs in Kibana,</li>
+<li>Prepare Docker images to run my domain,</li>
+<li>Create the WebLogic domain,</li>
+<li>Verify access to the WebLogic administration console and WLST,</li>
+<li>Deploy a test application into the cluster,</li>
+<li>Set up a route to expose the application publicly,</li>
+<li>Test scaling and load balancing, and</li>
+<li>Install the WebLogic Exporter to get metrics into Prometheus.</li>
+</ul>
+
+<p>Before we get started, you should clone the WebLogic operator project
+from GitHub.  It contains many of the samples and helpers we will need.</p>
+
+<pre><code>git clone https://github.com/oracle/weblogic-kubernetes-operator
+</code></pre>
+
+<h2 id="create-a-new-project-namespace">Create a new project (namespace)</h2>
+
+<p>In the OpenShift web user interface, create a new project.  If you already
+have other projects, go to the Application Console, and then click on the
+project pulldown at the top and click on &ldquo;View All Projects&rdquo; and then the
+&ldquo;Create Project&rdquo; button.  If you don&rsquo;t have existing projects, OpenShift
+will take you right to the create project page when you log in.  I called
+my project &ldquo;weblogic&rdquo; as you can see in the image below:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os001.png" alt="Creating a new project" />
+    
+    
+    <figcaption>
+        <p>
+        Creating a new project
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>Then navigate into your project view.  Right now it will be empty, as shown
+below:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os002.png" alt="The new &#39;weblogic&#39; project" />
+    
+    
+    <figcaption>
+        <p>
+        The new &#39;weblogic&#39; project
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<h2 id="prepare-the-project-for-the-weblogic-kubernetes-operator">Prepare the project for the WebLogic Kubernetes Operator</h2>
+
+<p>The easiest way to get the operator Docker image is to just pull it from the
+Docker Hub.  You can review details of the image in the
+<a href="https://hub.docker.com/r/oracle/weblogic-kubernetes-operator">Docker Hub</a>.</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os003.png" alt="The WebLogic Kubernetes Operator in the Docker Hub" />
+    
+    
+    <figcaption>
+        <p>
+        The WebLogic Kubernetes Operator in the Docker Hub
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>You can use the following command to pull the image.  You may need to <code>docker login</code>
+first if you have not previously done so:</p>
+
+<pre><code>docker pull oracle/weblogic-kubernetes-operator:2.0
+</code></pre>
+
+<p>Instead of pulling the image and manually copying it onto our OpenShift nodes,
+we could also just add an Image Pull Secret to our project (namespace) so
+that OpenShift will be able to pull the image for us.  We can do this
+with the following commands (at this stage we are using a user with the <code>cluster-admin</code> role):</p>
+
+<pre><code>oc project weblogic
+oc create secret docker-registry docker-store-secret \
+   --docker-server=store.docker.com \
+   --docker-username=DOCKER_USER \
+   --docker-password=DOCKER_PASSWORD \
+   --docker-email=DOCKER_EMAIL
+</code></pre>
+
+<p>In this command, replace <code>DOCKER_USER</code> with your Docker store userid,
+<code>DOCKER_PASSWORD</code> with your password, and <code>DOCKER_EMAIL</code> with the email
+address associated with your Docker Hub account.</p>
+
+<p>We also need to tell OpenShift to link this secret to our service account.
+Assuming we want to use the <code>default</code> service account in our <code>weblogic</code>
+project (namespace), we can run this command:</p>
+
+<pre><code>oc secrets link default docker-store-secret --for=pull
+</code></pre>
+
+<h2 id="optional-build-the-image-yourself">(Optional) Build the image yourself</h2>
+
+<p>It is also possible to build the image yourself, rather than pulling it
+from Docker Hub.  If you want to do that, first go to Docker Hub and
+accept the license for the <a href="https://hub.docker.com/_/oracle-serverjre-8">Server JRE image</a>,
+ensure you have the <a href="https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/user-guide.md#prerequisites">listed
+prerequisites</a> installed, and then run these commands:</p>
+
+<pre><code>mvn clean install 
+docker build -t weblogic-kubernetes-operator:2.0 --build-arg VERSION=2.0 .
+</code></pre>
+
+<h2 id="install-the-elastic-stack">Install the Elastic stack</h2>
+
+<p>The operator can optionally send its logs to Elasticsearch and Kibana.
+This provides a nice way to view the logs, and to search and filter and so on,
+so let&rsquo;s install this too.</p>
+
+<p>A sample YAML file is provided in the project to install them:</p>
+
+<pre><code>kubernetes/samples/scripts/elasticsearch-and-kibana/elasticsearch_and_kibana.yaml
+</code></pre>
+
+<p>Edit this file to set the namespace to &ldquo;weblogic&rdquo; for each deployment and
+service (i.e. on lines 30, 55, 74 and 98 - just search for <code>namespace</code>)
+and then install them using this command:</p>
+
+<pre><code>oc apply -f kubernetes/samples/scripts/elasticsearch-and-kibana/elasticsearch_and_kibana.yaml
+</code></pre>
+
+<p>After a few moments, you should see the pods running in our namespace:</p>
+
+<pre><code>oc get pods,services
+NAME                                 READY     STATUS    RESTARTS   AGE
+pod/elasticsearch-75b6f589cb-c9hbw   1/1       Running   0          10s
+pod/kibana-746cc75444-nt8pr          1/1       Running   0          10s
+
+NAME                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+service/elasticsearch   ClusterIP   172.30.143.158   &lt;none&gt;        9200/TCP,9300/TCP   10s
+service/kibana          NodePort    172.30.18.210    &lt;none&gt;        5601:32394/TCP      10s
+</code></pre>
+
+<p>So based on the service shown above and our project (namespace) named <code>weblogic</code>,
+the URL for Elasticsearch will be <code>elasticsearch.weblogic.svc.cluster.local:9200</code>.
+We will need this URL later.</p>
+
+<h2 id="install-the-operator">Install the operator</h2>
+
+<p>Now we are ready to install the operator.  In the 2.0 release, we use Helm to
+install the operator.  So first we need to download Helm and set up Tiller on
+our OpenShift cluster (if you have not already installed it).</p>
+
+<p>Helm provide <a href="https://github.com/kubernetes/helm/blob/master/docs/install.md">installation instructions</a>
+on their site.  I just downloaded the latest <a href="https://github.com/helm/helm/archive/v2.12.1.zip">release</a>,
+unzipped it, and made <code>helm</code> executable.</p>
+
+<p>Before we install Tiller, let&rsquo;s create a cluster role binding to make sure the
+<code>default</code> service account in the <code>kube-system</code> namespace (which tiller will run
+under) has the <code>cluster-admin</code> role, which it will need to install and manage
+the operation.</p>
+
+<pre><code>cat &lt;&lt; EOF | oc apply -f -
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller-cluster-admin
+roleRef:
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system
+userNames:
+- system:serviceaccount:kube-system:default
+EOF
+</code></pre>
+
+<p>Now we can execute <code>helm init</code> to install tiller on the OpenShift cluster.
+Check it was successful with this command:</p>
+
+<pre><code>oc get deploy -n kube-system
+NAME                         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+tiller-deploy                1         1         1            1           18s
+</code></pre>
+
+<p>When you install the operator you can either pass the configuration parameters
+into Helm on the command line, or if you prefer, you can store them in a YAML
+file and pass that file in.  I like to store them in a file.  There is a
+sample provided, so we can just make a copy and update it with our details.</p>
+
+<pre><code>cp kubernetes/charts/weblogic-operator/values.yaml my-operator-values.yaml
+</code></pre>
+
+<p>Here are the updates we need to make:</p>
+
+<ul>
+<li>Set the <code>domainNamespaces</code> parameter to include just <code>weblogic</code>, i.e. the
+project (namespace) that we created to install WebLogic in.</li>
+</ul>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
+</span></span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">domainNamespaces:
+<span style="display:block;width:100%;background-color:#3c3d38">  - <span style="color:#e6db74">&#34;weblogic&#34;</span></span></code></pre></td></tr></table>
+</div>
+</div>
+
+<ul>
+<li>Set the <code>image</code> parameter to match the name of the image you pulled from
+Docker Hub or built yourself.  If you just create the image pull secret
+then use the value I have shown here:</li>
+</ul>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
+</span></span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># image specifies the docker image containing the operator code.
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>image: <span style="color:#e6db74">&#34;oracle/weblogic-kubernetes-operator:2.0&#34;</span></span></code></pre></td></tr></table>
+</div>
+</div>
+
+<ul>
+<li>Set the <code>imagePullSecrets</code> list to include the secret we created earlier.
+If you did not create the secret you can leave this commented out.</li>
+</ul>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36
+</span></span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">imagePullSecrets:
+<span style="display:block;width:100%;background-color:#3c3d38">- name: <span style="color:#e6db74">&#34;docker-store-secret&#34;</span></span></code></pre></td></tr></table>
+</div>
+</div>
+
+<ul>
+<li>Set the <code>elkIntegrationEnabled</code> parameter to <code>true</code>.</li>
+</ul>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">90
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">91
+</span></span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># elkIntegrationEnabled specifies whether or not Elastic integration is enabled.
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>elkIntegrationEnabled: true</span></code></pre></td></tr></table>
+</div>
+</div>
+
+<ul>
+<li>Set the <code>elasticSearchHost</code> to the address of the Elasticsearch server
+that we set up earlier.</li>
+</ul>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">97
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">98
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">99
+</span></span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># elasticSearchHost specifies the hostname of where elasticsearch is running.
+</span><span style="color:#75715e"># This parameter is ignored if &#39;elkIntegrationEnabled&#39; is false.
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>elasticSearchHost: <span style="color:#e6db74">&#34;elasticsearch.weblogic.svc.cluster.local&#34;</span></span></code></pre></td></tr></table>
+</div>
+</div>
+
+<p>Now we can use helm to install the operator with this command. Notice
+that I pass in the name of my parameters YAML file in the <code>--values</code> option:</p>
+
+<pre><code>helm install kubernetes/charts/weblogic-operator \
+     --name weblogic-operator \
+     --namespace weblogic \
+     --values my-operator-values.yaml \
+     --wait
+</code></pre>
+
+<p>This command will wait until the operator starts up successfully.  If it has
+to pull the image, that will obviously take a little while, but if this command
+does not finish in a minute or so, then it is probably stuck.  You can
+send it to the background and start looking around to see what went wrong.
+Most often it will be a problem pulling the image.  If you see the pod has
+status <code>ImagePullBackOff</code> then OpenShift was not able to pull the image.</p>
+
+<p>You can verify the pod was created with this command:</p>
+
+<pre><code>oc get pods
+NAME                                READY     STATUS    RESTARTS   AGE
+elasticsearch-75b6f589cb-c9hbw      1/1       Running   0          2h
+kibana-746cc75444-nt8pr             1/1       Running   0          2h
+weblogic-operator-54d99679f-dkg65   1/1       Running   0          48s
+</code></pre>
+
+<h2 id="view-the-operator-logs-in-kibana">View the operator logs in Kibana</h2>
+
+<p>Now we have the operator running, let&rsquo;s take a look at the logs in Kibana.
+We installed Kibana earlier.  Let&rsquo;s expose Kibana outside our cluster:</p>
+
+<pre><code>oc expose service kibana
+route.route.openshift.io/kibana exposed
+</code></pre>
+
+<p>You can check this worked with these commands:</p>
+
+<pre><code>oc get routes
+NAME      HOST/PORT                                                      PATH      SERVICES   PORT      TERMINATION   WILDCARD
+kibana    kibana-weblogic.sub11201828382.certificationvc.oraclevcn.com             kibana     5601                    None
+
+oc get services
+NAME                             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+elasticsearch                    ClusterIP   172.30.143.158   &lt;none&gt;        9200/TCP,9300/TCP   2h
+internal-weblogic-operator-svc   ClusterIP   172.30.252.148   &lt;none&gt;        8082/TCP            7m
+kibana                           NodePort    172.30.18.210    &lt;none&gt;        5601:32394/TCP      2h
+</code></pre>
+
+<p>Now you should be able to access Kibana using the OpenShift front-end address
+and the node port for the Kibana service.  In my case the node port is <code>32394</code>
+and my OpenShift server is accessible to me as <code>openshift</code>
+so I would use the address <code>https://openshift:32394</code>.</p>
+
+<p>You will see a page like this one:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os004.png" alt="The initial Kibana page" />
+    
+    
+    <figcaption>
+        <p>
+        The initial Kibana page
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>Click on the &ldquo;Create&rdquo; button, then click on the &ldquo;Discover&rdquo; option in the menu
+on the left hand side.  Now hover over the entries for <code>level</code> and <code>log</code> in the
+field list, and click on the &ldquo;Add&rdquo; button that appears next to each one.</p>
+
+<p>Now you should have a nice log screen like this:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os005.png" alt="The operator logs in Kibana" />
+    
+    
+    <figcaption>
+        <p>
+        The operator logs in Kibana
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>Great! We have the operator installed.  Now we are ready to move on to create
+some WebLogic domains.</p>
+
+<h2 id="prepare-docker-images-to-run-the-domain">Prepare Docker images to run the domain</h2>
+
+<p>Now we have some choices to make.  There are two main ways to run WebLogic
+in Docker - we can use a standard Docker image which contains the WebLogic
+binaries but keep the domain configuration, applications, etc., outside the
+image, for example in a persistent volume; <em>or</em> we can create Docker images
+with both the WebLogic binaries and the domain burnt into them.  There are
+advantages and disadvantages to both approaches, so it really depends on
+how we want to treat our domain.</p>
+
+<p>The first approach is good if you just
+want to run WebLogic in Kubernetes but you still want to use the admin
+console and WLST and so on to manage it.  The second approach is better
+if you want to drive everything from a CI/CD pipeline where you do not
+mutate the running environment, but instead you update the source and then
+build new images and roll the environment to uptake them. A number of these
+kinds of considerations are listed <a href="https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/domains.md">here</a>.</p>
+
+<p>For the sake of this post, let&rsquo;s use the &ldquo;domain in image&rdquo; option (the
+second approach).</p>
+
+<p>So we will need a base WebLogic image with the necessary patches installed,
+and then we will create our domain on top of that.  Let&rsquo;s create a domain
+with a web application deployed in it, so that we have something to use
+to test our load balancing configuration and scaling later on.</p>
+
+<p>The easiest way to get the base image is to grab it from Oracle using
+this command:</p>
+
+<pre><code>docker pull store/oracle/weblogic:12.2.1.3
+</code></pre>
+
+<p>The standard <a href="https://hub.docker.com/_/oracle-weblogic-server-12c">WebLogic Server 12.2.1.3.0</a>
+image from Docker Hub has the necessary patches already installed.  It is
+worth knowing how to install patches, in case you need some additional one-off patches.
+If you are not interested in that, skip forward to
+<a href="#creating-the-image-with-the-domain-in-it">here</a>.</p>
+
+<h3 id="optional-manually-creating-a-patched-weblogic-image">(Optional) Manually creating a patched WebLogic image</h3>
+
+<p>Here is an example <code>Dockerfile</code> that we can use to install the necessary
+patches.  You can modify this to add any additional one-off patches that
+you need.  Follow that pattern already there to copy the patch into the
+container, apply it, and then remove the temporary files after you are done.</p>
+
+<pre><code># ---------------------------------------------
+# Install patches to run WebLogic on Kubernetes
+# ---------------------------------------------
+
+# Start with an unpatched WebLogic 12.2.1.3.0 Docker image
+FROM your/weblogic-image:12.2.1.3
+
+MAINTAINER Mark Nelson &lt;mark.x.nelson@oracle.com&gt;
+
+# We need patch 29135930 to run WebLogic on Kubernetes
+# We will also also install the latest PSU which is 28298734
+# That prereqs a newer version of OPatch, which is provided by 28186730
+
+ENV PATCH_PKG0=&quot;p28186730_139400_Generic.zip&quot;
+ENV PATCH_PKG2=&quot;p28298734_122130_Generic.zip&quot;
+ENV PATCH_PKG3=&quot;p29135930_12213181016_Generic.zip&quot;
+
+# Copy the patches into the container
+COPY $PATCH_PKG0 /u01/
+COPY $PATCH_PKG2 /u01/
+COPY $PATCH_PKG3 /u01/
+
+
+# Install the psmisc package which is a prereq for 28186730
+USER root
+RUN yum -y install psmisc
+
+# Install the three patches we need - do it all in one command to
+# minimize the number of layers and the size of the resulting image.
+# Also run opatch cleanup and remove temporary files.
+USER oracle
+RUN cd /u01 &amp;&amp; \
+    $JAVA_HOME/bin/jar xf /u01/$PATCH_PKG0 &amp;&amp; \
+    $JAVA_HOME/bin/java -jar /u01/6880880/opatch_generic.jar \
+        -silent oracle_home=/u01/oracle -ignoreSysPrereqs &amp;&amp; \
+    echo &quot;opatch updated&quot; &amp;&amp; \
+    sleep 5 &amp;&amp; \
+    cd /u01 &amp;&amp; \
+    $JAVA_HOME/bin/jar xf /u01/$PATCH_PKG2 &amp;&amp; \
+    cd /u01/28298734 &amp;&amp; \
+    $ORACLE_HOME/OPatch/opatch apply -silent &amp;&amp; \
+    cd /u01 &amp;&amp; \
+    $JAVA_HOME/bin/jar xf /u01/$PATCH_PKG3 &amp;&amp; \
+    cd /u01/29135930 &amp;&amp; \
+    $ORACLE_HOME/OPatch/opatch apply -silent &amp;&amp; \
+    $ORACLE_HOME/OPatch/opatch util cleanup -silent &amp;&amp; \
+    rm /u01/$PATCH_PKG0 &amp;&amp; \
+    rm /u01/$PATCH_PKG2 &amp;&amp; \
+    rm /u01/$PATCH_PKG3 &amp;&amp; \
+    rm -rf /u01/6880880 &amp;&amp; \
+    rm -rf /u01/28298734 &amp;&amp; \
+    rm -rf /u01/29135930 
+
+WORKDIR ${ORACLE_HOME}
+
+CMD [&quot;/u01/oracle/createAndStartEmptyDomain.sh&quot;]
+</code></pre>
+
+<p>This <code>Dockerfile</code> assumes the patch archives are available in the same
+directory. You would need to download the patches from <a href="https://support.oracle.com">My Oracle
+Support</a> and then you can build the image
+with this command:</p>
+
+<pre><code>docker build -t my-weblogic-base-image:12.2.1.3.0 .
+</code></pre>
+
+<h3 id="creating-the-image-with-the-domain-in-it">Creating the image with the domain in it</h3>
+
+<p>I am going to use the <a href="https://github.com/oracle/weblogic-deploy-tooling">WebLogic Deploy Tooling</a>
+to define my domain.  If you are not familiar with this tool, you might
+want to check it out!  It lets you define your domain declaratively instead
+of writing custom WLST scripts.  For just one domain, maybe not such a big
+deal, but if you need to create a lot of domains it is pretty useful.  It
+also lets you parameterize them, and it can introspect existing domains to
+create a model and associated artifacts.  You can also use it to &ldquo;move&rdquo;
+domains from place to place, say from an on-premises install to Kubernetes,
+and you can change the version of WebLogic on the way without needing to worry
+about differences in WLST from version to version - it takes care of all
+that for you.  Of course, we don&rsquo;t need all those features for what we need
+to do here, but it is good to know they are there for when you might need
+them!</p>
+
+<p>I created a GitHub repository with my domain model
+<a href="https://github.com/markxnelson/simple-sample-domain">here</a>. You can just
+clone this repository and then run the commands below to download
+the WebLogic Deploy Tooling and then build the domain in a new Docker
+image that we will tag <code>my-domain1-image:1.0</code>:</p>
+
+<pre><code>git clone https://github.com/markxnelson/simple-sample-domain
+cd simple-sample-domain
+curl -Lo weblogic-deploy.zip https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-0.14/weblogic-deploy.zip
+# make sure JAVA_HOME is set correctly, and `mvn` is on your PATH
+./build-archive.sh
+./quickBuild.sh
+</code></pre>
+
+<p>I won&rsquo;t go into all the nitty gritty details of how this works, that&rsquo;s a
+subject for another post (if you are interested, take a look at the documentation
+in the <a href="https://github.com/oracle/weblogic-deploy-tooling">GitHub project</a>),
+but take a look at the <code>simple-toplogy.yaml</code> file
+to get a feel for what is happening:</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">37
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">38
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">domainInfo:
+    AdminUserName: <span style="color:#e6db74">&#39;@@FILE:/u01/oracle/properties/adminuser.properties@@&#39;</span>
+    AdminPassword: <span style="color:#e6db74">&#39;@@FILE:/u01/oracle/properties/adminpass.properties@@&#39;</span>
+topology:
+    Name: <span style="color:#e6db74">&#39;@@PROP:DOMAIN_NAME@@&#39;</span>
+    AdminServerName: <span style="color:#e6db74">&#39;@@PROP:ADMIN_NAME@@&#39;</span>
+    ProductionModeEnabled: <span style="color:#e6db74">&#39;@@PROP:PRODUCTION_MODE_ENABLED@@&#39;</span>
+    Log:
+        FileName: <span style="color:#e6db74">&#39;@@PROP:DOMAIN_NAME@@.log&#39;</span>
+    Cluster:
+        <span style="color:#e6db74">&#39;@@PROP:CLUSTER_NAME@@&#39;</span>:
+            DynamicServers:
+                ServerTemplate: <span style="color:#e6db74">&#39;@@PROP:CLUSTER_NAME@@-template&#39;</span>
+                CalculatedListenPorts: false
+                ServerNamePrefix: <span style="color:#e6db74">&#39;@@PROP:MANAGED_SERVER_NAME_BASE@@&#39;</span>
+                DynamicClusterSize: <span style="color:#e6db74">&#39;@@PROP:CONFIGURED_MANAGED_SERVER_COUNT@@&#39;</span>
+                MaxDynamicClusterSize: <span style="color:#e6db74">&#39;@@PROP:CONFIGURED_MANAGED_SERVER_COUNT@@&#39;</span>
+    Server:
+        <span style="color:#e6db74">&#39;@@PROP:ADMIN_NAME@@&#39;</span>:
+            ListenPort: <span style="color:#e6db74">&#39;@@PROP:ADMIN_PORT@@&#39;</span>
+            NetworkAccessPoint:
+                T3Channel:
+                    ListenPort: <span style="color:#e6db74">&#39;@@PROP:T3_CHANNEL_PORT@@&#39;</span>
+                    PublicAddress: <span style="color:#e6db74">&#39;@@PROP:T3_PUBLIC_ADDRESS@@&#39;</span>
+                    PublicPort: <span style="color:#e6db74">&#39;@@PROP:T3_CHANNEL_PORT@@&#39;</span>
+    ServerTemplate:
+        <span style="color:#e6db74">&#39;@@PROP:CLUSTER_NAME@@-template&#39;</span>:
+            ListenPort: <span style="color:#e6db74">&#39;@@PROP:MANAGED_SERVER_PORT@@&#39;</span>
+            Cluster: <span style="color:#e6db74">&#39;@@PROP:CLUSTER_NAME@@&#39;</span>
+appDeployments:
+    Application:
+        <span style="color:#75715e"># Quote needed because of hyphen in string
+</span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#39;test-webapp&#39;</span>:
+            SourcePath: <span style="color:#e6db74">&#39;wlsdeploy/applications/test-webapp.war&#39;</span>
+            Target: <span style="color:#e6db74">&#39;@@PROP:CLUSTER_NAME@@&#39;</span>
+            ModuleType: war
+            StagingMode: nostage
+            PlanStagingMode: nostage</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>As you can see it is all parameterized. Most of those properties are defined
+in <code>properties/docker-build/domain.properties</code>:</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># These variables are used for substitution in the WDT model file.
+</span><span style="color:#75715e"># Any port that will be exposed through Docker is put in this file.
+</span><span style="color:#75715e"># The sample Dockerfile will get the ports from this file and not the WDT model.
+</span><span style="color:#75715e"></span>DOMAIN_NAME<span style="color:#f92672">=</span>domain1
+ADMIN_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">7001</span>
+ADMIN_NAME<span style="color:#f92672">=</span>admin-server
+ADMIN_HOST<span style="color:#f92672">=</span>domain1-admin-server
+MANAGED_SERVER_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">8001</span>
+MANAGED_SERVER_NAME_BASE<span style="color:#f92672">=</span>managed-server-
+CONFIGURED_MANAGED_SERVER_COUNT<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>
+CLUSTER_NAME<span style="color:#f92672">=</span>cluster-1
+DEBUG_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">8453</span>
+DEBUG_FLAG<span style="color:#f92672">=</span>false
+PRODUCTION_MODE_ENABLED<span style="color:#f92672">=</span>true
+JAVA_OPTIONS<span style="color:#f92672">=</span>-Dweblogic.StdoutDebugEnabled<span style="color:#f92672">=</span>false
+T3_CHANNEL_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">30012</span>
+T3_PUBLIC_ADDRESS<span style="color:#f92672">=</span>openshift
+CLUSTER_ADMIN<span style="color:#f92672">=</span>cluster-1,admin-server</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>On lines 10-17 we are defining a cluster named <code>cluster-1</code> with two dynamic
+servers in it. On 18-25 we are defining the admin server.  And on 30-38 we
+are defining an application that we want deployed.  This is a simple web
+application that prints out the IP address of the managed server it is running
+on.  Here is the main page of that application:</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">&lt;%</span><span style="color:#960050;background-color:#1e0010">@</span> page import<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;java.net.UnknownHostException&#34;</span> <span style="color:#f92672">%&gt;</span>
+<span style="color:#f92672">&lt;%</span><span style="color:#960050;background-color:#1e0010">@</span> page import<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;java.net.InetAddress&#34;</span> <span style="color:#f92672">%&gt;</span>
+<span style="color:#f92672">&lt;%</span><span style="color:#960050;background-color:#1e0010">@</span> taglib prefix<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;c&#34;</span> uri<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://java.sun.com/jsp/jstl/core&#34;</span> <span style="color:#f92672">%&gt;</span>
+<span style="color:#f92672">&lt;%</span><span style="color:#a6e22e">@page</span> contentType<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/html&#34;</span> pageEncoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span><span style="color:#f92672">%&gt;</span>
+<span style="color:#f92672">&lt;!</span>DOCTYPE html<span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span>html<span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;</span>head<span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;</span>meta http<span style="color:#f92672">-</span>equiv<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Content-Type&#34;</span> content<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/html; charset=UTF-8&#34;</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;</span>c:url value<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/res/styles.css&#34;</span> var<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesURL&#34;</span><span style="color:#f92672">/&gt;</span>
+    <span style="color:#f92672">&lt;</span>link rel<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesheet&#34;</span> href<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;${stylesURL}&#34;</span> type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;</span>title<span style="color:#f92672">&gt;</span>Test WebApp<span style="color:#f92672">&lt;/</span>title<span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;/</span>head<span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;</span>body<span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;%</span>
+      String hostname<span style="color:#f92672">,</span> serverAddress<span style="color:#f92672">;</span>
+      hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span><span style="color:#f92672">;</span>
+      serverAddress <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span><span style="color:#f92672">;</span>
+      <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+        InetAddress inetAddress<span style="color:#f92672">;</span>
+        inetAddress <span style="color:#f92672">=</span> InetAddress<span style="color:#f92672">.</span><span style="color:#a6e22e">getLocalHost</span><span style="color:#f92672">();</span>
+        hostname <span style="color:#f92672">=</span> inetAddress<span style="color:#f92672">.</span><span style="color:#a6e22e">getHostName</span><span style="color:#f92672">();</span>
+        serverAddress <span style="color:#f92672">=</span> inetAddress<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">();</span>
+      <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>UnknownHostException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+      <span style="color:#f92672">}</span>
+    <span style="color:#f92672">%&gt;</span>
+
+    <span style="color:#f92672">&lt;</span>li<span style="color:#f92672">&gt;</span>InetAddress: <span style="color:#f92672">&lt;%=</span>serverAddress <span style="color:#f92672">%&gt;</span>
+    <span style="color:#f92672">&lt;</span>li<span style="color:#f92672">&gt;</span>InetAddress<span style="color:#f92672">.</span><span style="color:#a6e22e">hostname</span><span style="color:#f92672">:</span> <span style="color:#f92672">&lt;%=</span>hostname <span style="color:#f92672">%&gt;</span>
+
+  <span style="color:#f92672">&lt;/</span>body<span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;/</span>html<span style="color:#f92672">&gt;</span></code></pre></td></tr></table>
+</div>
+</div>
+
+<p>The source code for the web application is in the <code>test-webapp</code> directory.
+We will use this application later to verify that scaling and load balancing
+is working as we expect.</p>
+
+<p>So now we have a Docker image with our custom domain in it, and the WebLogic
+Server binaries and the patches we need.  So we are ready to deploy it!</p>
+
+<h2 id="create-the-weblogic-domain">Create the WebLogic domain</h2>
+
+<p>First, we need to create a Kubernetes secret with the WebLogic credentials
+in it.  This is used by the operator to start the domain.  You can use the
+sample provided <a href="https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/scripts/create-weblogic-domain-credentials">here</a> to create the secret:</p>
+
+<pre><code>./create-weblogic-credentials.sh \
+   -u weblogic \
+   -p welcome1 \
+   -d domain1 \
+   -n weblogic
+</code></pre>
+
+<p>Next, we need to create the domain custom resource.  To do this, we prepare
+a Kubernetes YAML file as follows.  I have removed the comments to make this
+more readable, you can find a sample <a href="https://github.com/oracle/weblogic-kubernetes-operator/blob/master/kubernetes/samples/scripts/create-weblogic-domain/manually-create-domain/domain.yaml">here</a>
+which has extensive comments to explain how to create these files:</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion: <span style="color:#e6db74">&#34;weblogic.oracle/v2&#34;</span>
+kind: Domain
+metadata:
+  name: domain1
+  namespace: weblogic
+  labels:
+    weblogic.resourceVersion: domain-v2
+    weblogic.domainUID: domain1
+spec:
+  domainHome: /u01/oracle/user_projects/domains/domain1
+  domainHomeInImage: <span style="color:#66d9ef">true</span>
+  image: <span style="color:#e6db74">&#34;my-domain1-image:1.0&#34;</span>
+  imagePullPolicy: <span style="color:#e6db74">&#34;IfNotPresent&#34;</span>
+  webLogicCredentialsSecret: 
+    name: domain1-weblogic-credentials
+  includeServerOutInPodLog: <span style="color:#66d9ef">true</span>
+  serverStartPolicy: <span style="color:#e6db74">&#34;IF_NEEDED&#34;</span>
+  serverPod:
+    annotations: 
+      openshift.io/scc: anyuid
+    env:
+    - name: JAVA_OPTIONS
+      value: <span style="color:#e6db74">&#34;-Dweblogic.StdoutDebugEnabled=false&#34;</span>
+    - name: USER_MEM_ARGS
+      value: <span style="color:#e6db74">&#34;-Xms64m -Xmx256m &#34;</span>
+  adminServer:
+    serverStartState: <span style="color:#e6db74">&#34;RUNNING&#34;</span>
+    adminService:
+      channels:
+       - channelName: default
+         nodePort: <span style="color:#ae81ff">30701</span>
+       - channelName: T3Channel
+  clusters:
+  - clusterName: cluster-<span style="color:#ae81ff">1</span>
+    serverStartState: <span style="color:#e6db74">&#34;RUNNING&#34;</span>
+    replicas: <span style="color:#ae81ff">2</span></code></pre></td></tr></table>
+</div>
+</div>
+
+<p>Now we can use this file to create the domain custom resource, using the
+following command:</p>
+
+<pre><code>oc apply -f domain.yaml
+</code></pre>
+
+<p>You can verify it was created, and view the resource that was created with
+these commands:</p>
+
+<pre><code>oc get domains
+oc describe domain domain1
+</code></pre>
+
+<p>The operator will notice this new domain custom resource and it will react
+accordingly.  In this case, since we have asked for the admin server and
+the servers in the the cluster to come to the &ldquo;RUNNING&rdquo; state (in lines 27
+and 25 above) the operator will start up the admin server first, and then
+both managed servers.  You can watch this happen using this command:</p>
+
+<pre><code>oc get pods -w
+</code></pre>
+
+<p>This will print out the current pods, and then update every time there is
+a change in status.  You can hit Ctrl-C to exit from the command when you
+have seen enough.</p>
+
+<p>The operator also creates services for the admin server, each managed server
+and the cluster.  You can see the services with this command:</p>
+
+<pre><code>oc get services
+</code></pre>
+
+<p>You will notice a service called <code>domain1-admin-server-external</code> which is
+used to expose the admin server&rsquo;s default channel outside of the cluster,
+to allow us to access the admin console and to use WLST.  We need to tell
+OpenShift to make this service available externally by creating a route
+with this command:</p>
+
+<pre><code>oc expose service domain1-admin-server-external --port=default
+</code></pre>
+
+<p>This will expose that service on the <code>NodePort</code> it declared.</p>
+
+<h2 id="verify-access-to-the-weblogic-administration-console-and-wlst">Verify access to the WebLogic administration console and WLST</h2>
+
+<p>Now you can start a browser and point it to any one of your worker nodes
+and use the <code>NodePort</code> from the service (<code>30701</code> in the example above) to
+access the admin console.  For me, since I have an entry in my <code>/etc/hosts</code>
+for my OpenShift server, this address is <code>http://openshift:30701/console</code>.</p>
+
+<p>You can log in to the admin console and use it as normal.  You might like
+to navigate into &ldquo;Deployments&rdquo; to verify that our web application is there:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os006.png" alt="Viewing the test application in the WebLogic admin console" />
+    
+    
+    <figcaption>
+        <p>
+        Viewing the test application in the WebLogic admin console
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>You might also like to go to the &ldquo;Server&rdquo; page to validate that you can see
+all of the managed servers:</p>
+
+
+<figure>
+    
+        <img src="../../images/wls-on-os007.png" alt="Viewing the managed servers in the WebLogic admin console" />
+    
+    
+    <figcaption>
+        <p>
+        Viewing the managed servers in the WebLogic admin console
+        
+            
+        
+        </p> 
+    </figcaption>
+    
+</figure>
+
+
+<p>We can also use WLST against the domain, if desired.  To do this, just
+start up WLST as normal on your client machine and then use the OpenShift
+server address and the <code>NodePort</code> to form the <code>t3</code> URL. Using the example
+above, my URL is <code>t3://openshift:30701</code>:</p>
+
+<pre><code>~/wls/oracle_common/common/bin/wlst.sh
+
+Initializing WebLogic Scripting Tool (WLST) ...
+
+Jython scans all the jar files it can find at first startup. Depending on the system, this process may take a few minutes to complete, and WLST may not return a prompt right away.
+
+Welcome to WebLogic Server Administration Scripting Shell
+
+Type help() for help on available commands
+
+wls:/offline&gt; connect('weblogic','welcome1','t3://openshift:30701')
+Connecting to t3://openshift:30701 with userid weblogic ...
+Successfully connected to Admin Server &quot;admin-server&quot; that belongs to domain &quot;domain1&quot;.
+
+Warning: An insecure protocol was used to connect to the server.
+To ensure on-the-wire security, the SSL port or Admin port should be used instead.
+
+wls:/domain1/serverConfig/&gt; ls('Servers')
+dr--   admin-server
+dr--   managed-server-1
+dr--   managed-server-2
+
+wls:/domain1/serverConfig/&gt;
+</code></pre>
+
+<p>You can use WLST as normal, either interactively, or you can run scripts.
+Keep in mind though, that since you have your domain burnt into the image,
+when you restart the pods, any changes you made with WLST would be lost.
+If you want to make permanent changes, you would need to include the WLST
+scripts in the image building process and then re-run it to build a new
+version of the image.</p>
+
+<p>Of course, if you have chosen to put your domain in peristent storage instead
+of burning it into the image, this caveat would not apply.</p>
+
+<h2 id="set-up-a-route-to-expose-the-application-publicly">Set up a route to expose the application publicly</h2>
+
+<p>Now, let&rsquo;s expose our web application outside the OpenShift cluster.  To
+do this, we are going to want to set up a load balancer to distribute
+requests across all of the managed servers, and then expose the load
+balancer endpoint.</p>
+
+<p>We can use the provided <a href="https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/charts/traefik">sample</a>
+to install the Traefik load balancer using the following command:</p>
+
+<pre><code>helm install stable/traefik \
+     --name traefik-operator \
+     --namespace traefik \
+     --values kubernetes/samples/charts/traefik/values.yaml  \
+     --set &quot;kubernetes.namespaces={traefik,weblogic}&quot; \
+     --wait
+</code></pre>
+
+<p>Make sure you include the <code>weblogic</code> namespace so the Traefik ingress
+controller knows to load balance ingresses in our namespace.</p>
+
+<p>Next, we need to create the ingress object.  We can also do this with the
+provided <a href="https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples/charts/ingress-per-domain">sample</a>
+using this command:</p>
+
+<pre><code>helm install kubernetes/samples/charts/ingress-per-domain \
+     --name domain1-ingress \
+     --namespace weblogic \
+     --set wlsDomain.domainUID=domain1 \
+     --set traefik.hostname=domain1.org
+</code></pre>
+
+<p>Note that you would set the hostname to your real DNS hostname when you do
+this for real.  In this example, I am just using a made up hostname.</p>
+
+<h2 id="test-scaling-and-load-balancing">Test scaling and load balancing</h2>
+
+<p>Now we can hit the web application to verify the load balancing is working.
+You can hit it from a browser, but in that case session affinity will kick
+in, so you will likely see a response from the same managed server over and
+over again.  If you use <code>curl</code> though, you should see it round robin.</p>
+
+<p>You can run curl in a loop using this command:</p>
+
+<pre><code>while true
+do
+  sleep 2
+  curl -v -H 'host: domain1.org' http://openshift:30305/testwebapp/
+done
+</code></pre>
+
+<p>The web application just prints out the name and IP address of the managed
+server.  So you should see the output alternate between all of the managed
+servers in sequence.</p>
+
+<p>Now, let&rsquo;s scale the cluster down and see what happens.  To initiate scaling,
+we can just edit the domain custom resource with this command:</p>
+
+<pre><code>oc edit domain domain1
+</code></pre>
+
+<p>This will open the domain custom resource in an editor.  Find the entry
+for <code>cluster-1</code> and underneath that the <code>replicas</code> entry:</p>
+
+<pre><code>  clusters:
+  - clusterName: cluster-1
+    clusterService:
+      annotations: {}
+      labels: {}
+    replicas: 4
+</code></pre>
+
+<p>You can change the <code>replicas</code> to another value, for example <code>2</code>, and then
+save and exit.  The operator will notice this change and will react by
+gracefully shutting down two of the managed servers.  You can watch this
+happen with the command:</p>
+
+<pre><code>oc get pods -w
+</code></pre>
+
+<p>You will also notice in the other window where you have <code>curl</code> running that
+those two managed servers no longer get requests.  You will also notice that
+there are not failed requests - the servers are removed from the <code>domain1-cluster-cluster-1</code>
+service early so they will not receive requests and lead to a connection refused
+or timeout.  The ingress and the load balancer automatically adjust.</p>
+
+<p>Once the scaling is finished, you might want to scale back up to <code>4</code> and
+watch the operation in reverse.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Well at this point we have our custom WebLogic domain, with our own
+configuration and applications deployed, running on OpenShift under the
+control of the operator.  We have seen how we can access the admin console,
+how to use WSLT, how to set up load balancing and expose applications outside
+the OpenShift cluster, and how to control scaling.</p>
+
+<p>In future posts I will look in more detail at related topics like using a
+CI/CD pipeline to drive image creation, exporting WebLogic metrics to
+Prometheus, and more.</p>
+<div class="mt6">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "weblogic-cafe" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </main>
+
+    <aside class="w-30-l mt6-l"><div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">What's in this article</p>
+      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#create-a-new-project-namespace">Create a new project (namespace)</a></li>
+<li><a href="#prepare-the-project-for-the-weblogic-kubernetes-operator">Prepare the project for the WebLogic Kubernetes Operator</a></li>
+<li><a href="#optional-build-the-image-yourself">(Optional) Build the image yourself</a></li>
+<li><a href="#install-the-elastic-stack">Install the Elastic stack</a></li>
+<li><a href="#install-the-operator">Install the operator</a></li>
+<li><a href="#view-the-operator-logs-in-kibana">View the operator logs in Kibana</a></li>
+<li><a href="#prepare-docker-images-to-run-the-domain">Prepare Docker images to run the domain</a>
+<ul>
+<li><a href="#optional-manually-creating-a-patched-weblogic-image">(Optional) Manually creating a patched WebLogic image</a></li>
+<li><a href="#creating-the-image-with-the-domain-in-it">Creating the image with the domain in it</a></li>
+</ul></li>
+<li><a href="#create-the-weblogic-domain">Create the WebLogic domain</a></li>
+<li><a href="#verify-access-to-the-weblogic-administration-console-and-wlst">Verify access to the WebLogic administration console and WLST</a></li>
+<li><a href="#set-up-a-route-to-expose-the-application-publicly">Set up a route to expose the application publicly</a></li>
+<li><a href="#test-scaling-and-load-balancing">Test scaling and load balancing</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="../../posts/wko2rc2/">WebLogic Kubernetes Operator 2.0 Release Candidate 2 now available</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="../../posts/openshift-relocate-var-lib-docker/">Relocate the /var/lib/docker storage on an OpenShift system</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="../../posts/wko2rc/">WebLogic Kubernetes Operator 2.0 Release Candidate now available</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="../../posts/openshift/">Running OpenShift on OCI</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://weblogic.cafe/" >
+    &copy; 2019 Mark Nelson 
+  </a>
+    <div>
+
+
+
+  <a href="https://twitter.com/markxnelson" class="link-transition twitter link dib z-999 pt3 pt0-l mr2" title="Twitter link">
+    <svg height="32px"  style="enable-background:new 0 0 67 67;" version="1.1" viewBox="0 0 67 67" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M37.167,22.283c-2.619,0.953-4.274,3.411-4.086,6.101  l0.063,1.038l-1.048-0.127c-3.813-0.487-7.145-2.139-9.974-4.915l-1.383-1.377l-0.356,1.017c-0.754,2.267-0.272,4.661,1.299,6.271  c0.838,0.89,0.649,1.017-0.796,0.487c-0.503-0.169-0.943-0.296-0.985-0.233c-0.146,0.149,0.356,2.076,0.754,2.839  c0.545,1.06,1.655,2.097,2.871,2.712l1.027,0.487l-1.215,0.021c-1.173,0-1.215,0.021-1.089,0.467  c0.419,1.377,2.074,2.839,3.918,3.475l1.299,0.444l-1.131,0.678c-1.676,0.976-3.646,1.526-5.616,1.568  C19.775,43.256,19,43.341,19,43.405c0,0.211,2.557,1.397,4.044,1.864c4.463,1.377,9.765,0.783,13.746-1.568  c2.829-1.673,5.657-5,6.978-8.221c0.713-1.716,1.425-4.851,1.425-6.354c0-0.975,0.063-1.102,1.236-2.267  c0.692-0.678,1.341-1.419,1.467-1.631c0.21-0.403,0.188-0.403-0.88-0.043c-1.781,0.636-2.033,0.551-1.152-0.402  c0.649-0.678,1.425-1.907,1.425-2.267c0-0.063-0.314,0.042-0.671,0.233c-0.377,0.212-1.215,0.53-1.844,0.72l-1.131,0.361l-1.027-0.7  c-0.566-0.381-1.361-0.805-1.781-0.932C39.766,21.902,38.131,21.944,37.167,22.283z M33,64C16.432,64,3,50.569,3,34S16.432,4,33,4  s30,13.431,30,30S49.568,64,33,64z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/></svg>
+
+  </a>
+
+
+
+
+  <a href="https://www.linkedin.com/in/marknelson6/" class="link-transition linkedin link dib z-999 pt3 pt0-l mr2" title="LinkedIn link">
+    <svg  height="32px"  style="enable-background:new 0 0 65 65;" version="1.1" viewBox="0 0 65 65" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M50.837,48.137V36.425c0-6.275-3.35-9.195-7.816-9.195  c-3.604,0-5.219,1.983-6.119,3.374V27.71h-6.79c0.09,1.917,0,20.427,0,20.427h6.79V36.729c0-0.609,0.044-1.219,0.224-1.655  c0.49-1.22,1.607-2.483,3.482-2.483c2.458,0,3.44,1.873,3.44,4.618v10.929H50.837z M22.959,24.922c2.367,0,3.842-1.57,3.842-3.531  c-0.044-2.003-1.475-3.528-3.797-3.528s-3.841,1.524-3.841,3.528c0,1.961,1.474,3.531,3.753,3.531H22.959z M34,64  C17.432,64,4,50.568,4,34C4,17.431,17.432,4,34,4s30,13.431,30,30C64,50.568,50.568,64,34,64z M26.354,48.137V27.71h-6.789v20.427  H26.354z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/>
+</svg>
+
+  </a>
+
+
+  <a href="https://github.com/markxnelson" class="link-transition github link dib z-999 pt3 pt0-l mr2" title="Github link">
+    <svg  height="32px"  style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" >
+  <path d="M256,32C132.3,32,32,134.8,32,261.7c0,101.5,64.2,187.5,153.2,217.9c11.2,2.1,15.3-5,15.3-11.1   c0-5.5-0.2-19.9-0.3-39.1c-62.3,13.9-75.5-30.8-75.5-30.8c-10.2-26.5-24.9-33.6-24.9-33.6c-20.3-14.3,1.5-14,1.5-14   c22.5,1.6,34.3,23.7,34.3,23.7c20,35.1,52.4,25,65.2,19.1c2-14.8,7.8-25,14.2-30.7c-49.7-5.8-102-25.5-102-113.5   c0-25.1,8.7-45.6,23-61.6c-2.3-5.8-10-29.2,2.2-60.8c0,0,18.8-6.2,61.6,23.5c17.9-5.1,37-7.6,56.1-7.7c19,0.1,38.2,2.6,56.1,7.7   c42.8-29.7,61.5-23.5,61.5-23.5c12.2,31.6,4.5,55,2.2,60.8c14.3,16.1,23,36.6,23,61.6c0,88.2-52.4,107.6-102.3,113.3   c8,7.1,15.2,21.1,15.2,42.5c0,30.7-0.3,55.5-0.3,63c0,6.1,4,13.3,15.4,11C415.9,449.1,480,363.1,480,261.7   C480,134.8,379.7,32,256,32z"/>
+</svg>
+
+  </a>
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="../../dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>
