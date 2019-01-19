@@ -5,6 +5,8 @@ draft: false
 toc: true
 tags: [weblogic,openshift]
 ---
+*Note: This post is also available on the [official WebLogic Server blog](https://blogs.oracle.com/weblogicserver/running-weblogic-on-openshift).*
+
 In this post I am going to walk through setting up and using WebLogic on 
 OpenShift, using the [Oracle WebLogic Server Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).  My starting point is the OpenShift Container Platform server 
 that I set up on OCI in [this earlier post](/posts/openshift).
