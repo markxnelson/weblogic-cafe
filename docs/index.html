@@ -40,7 +40,7 @@
 
 
 
-<meta property="og:updated_time" content="2019-01-19T08:30:16-05:00"/>
+<meta property="og:updated_time" content="2019-02-04T12:16:44-05:00"/>
 
 
 
@@ -177,6 +177,31 @@ if (!doNotTrack) {
       
       <div class="blah w-100">
         <h1 class="f3 fw1 athelas mt0 lh-title">
+          <a href="./posts/atp-datasource/" class="color-inherit dim link">
+            Configuring a WebLogic Data Source to use ATP
+            </a>
+        </h1>
+        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
+          In this post I am going to share details about how to configure a WebLogic data source to use ATP.
+If you are not familiar with ATP, it is the new Autonomous Transaction Processing service on Oracle Cloud. It provides a fully managed autonomous database. You can create a new database in the OCI console in the Database menu under &ldquo;Autonomous Transaction Processing&rdquo; by clicking on that big blue button:
+        </div>
+          <a href="./posts/atp-datasource/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+        
+      </div>
+    </div>
+  </div>
+</article>
+
+          </div>
+        
+          <div class="relative w-100 mb4">
+            
+<article class="bb b--black-10">
+  <div class="db pv4 ph3 ph0-l no-underline dark-gray">
+    <div class="flex flex-column flex-row-ns">
+      
+      <div class="blah w-100">
+        <h1 class="f3 fw1 athelas mt0 lh-title">
           <a href="./posts/weblogic-on-openshift/" class="color-inherit dim link">
             WebLogic on OpenShift
             </a>
@@ -221,37 +246,18 @@ The 2.0 release adds some significant new features including:
 
           </div>
         
-          <div class="relative w-100 mb4">
-            
-<article class="bb b--black-10">
-  <div class="db pv4 ph3 ph0-l no-underline dark-gray">
-    <div class="flex flex-column flex-row-ns">
-      
-      <div class="blah w-100">
-        <h1 class="f3 fw1 athelas mt0 lh-title">
-          <a href="./posts/openshift-relocate-var-lib-docker/" class="color-inherit dim link">
-            Relocate the /var/lib/docker storage on an OpenShift system
-            </a>
-        </h1>
-        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
-          Today I ran out of space in the filesystem containing the /var/lib/docker directory on my OpenShift system, which meant I could not schedule any new pods (you get an error about disk pressure). So I decided I needed some more space.
-I created a new partition with parted and then I updated my /etc/fstab to include that partition, with it mounted at /var/lib/docker. Then I made a new XFS filesystem on the with this command:
-        </div>
-          <a href="./posts/openshift-relocate-var-lib-docker/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
-        
-      </div>
-    </div>
-  </div>
-</article>
-
-          </div>
-        
       </section>
 
       
       <section class="w-100">
         <h1 class="f3">More</h1>
         
+        
+          <h2 class="f5 fw4 mb4 dib mr3">
+            <a href="./posts/openshift-relocate-var-lib-docker/" class="link black dim">
+              Relocate the /var/lib/docker storage on an OpenShift system
+            </a>
+          </h2>
         
           <h2 class="f5 fw4 mb4 dib mr3">
             <a href="./posts/spinnaker/" class="link black dim">
@@ -268,12 +274,6 @@ I created a new partition with parted and then I updated my /etc/fstab to includ
           <h2 class="f5 fw4 mb4 dib mr3">
             <a href="./posts/openshift/" class="link black dim">
               Running OpenShift on OCI
-            </a>
-          </h2>
-        
-          <h2 class="f5 fw4 mb4 dib mr3">
-            <a href="./posts/hello/" class="link black dim">
-              Hello
             </a>
           </h2>
         

@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/posts/atp-datasource/</loc>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/weblogic-on-openshift/</loc>
     <lastmod>2019-01-19T08:30:16-05:00</lastmod>
   </url>
@@ -42,6 +47,12 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/atp/</loc>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/tags/docker/</loc>
     <lastmod>2019-01-13T18:02:10-05:00</lastmod>
     <priority>0</priority>
@@ -73,7 +84,7 @@
   
   <url>
     <loc>http://weblogic.cafe/posts/</loc>
-    <lastmod>2019-01-19T08:30:16-05:00</lastmod>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -85,19 +96,19 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/</loc>
-    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/</loc>
-    <lastmod>2019-01-19T08:30:16-05:00</lastmod>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/tags/weblogic/</loc>
-    <lastmod>2019-01-19T08:30:16-05:00</lastmod>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
     <priority>0</priority>
   </url>
   

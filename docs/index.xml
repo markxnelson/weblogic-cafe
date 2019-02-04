@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Sat, 19 Jan 2019 08:30:16 -0500</lastBuildDate>
+    <lastBuildDate>Mon, 04 Feb 2019 12:16:44 -0500</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Configuring a WebLogic Data Source to use ATP</title>
+      <link>http://weblogic.cafe/posts/atp-datasource/</link>
+      <pubDate>Mon, 04 Feb 2019 12:16:44 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/posts/atp-datasource/</guid>
+      <description>In this post I am going to share details about how to configure a WebLogic data source to use ATP.
+If you are not familiar with ATP, it is the new Autonomous Transaction Processing service on Oracle Cloud. It provides a fully managed autonomous database. You can create a new database in the OCI console in the Database menu under &amp;ldquo;Autonomous Transaction Processing&amp;rdquo; by clicking on that big blue button:</description>
+    </item>
     
     <item>
       <title>WebLogic on OpenShift</title>
