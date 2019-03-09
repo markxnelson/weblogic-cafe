@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/posts/operator-201/</loc>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/atp-datasource/</loc>
     <lastmod>2019-02-04T12:16:44-05:00</lastmod>
   </url>
@@ -72,19 +77,19 @@
   
   <url>
     <loc>http://weblogic.cafe/tags/openshift/</loc>
-    <lastmod>2019-01-19T08:30:16-05:00</lastmod>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/tags/operator/</loc>
-    <lastmod>2019-01-16T17:14:28-05:00</lastmod>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://weblogic.cafe/posts/</loc>
-    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -102,7 +107,7 @@
   
   <url>
     <loc>http://weblogic.cafe/</loc>
-    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
     <priority>0</priority>
   </url>
   

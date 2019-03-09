@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Mon, 04 Feb 2019 12:16:44 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 09 Mar 2019 09:59:26 -0500</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Operator 2.0.1 Released with OpenShift Certification</title>
+      <link>http://weblogic.cafe/posts/operator-201/</link>
+      <pubDate>Sat, 09 Mar 2019 09:59:26 -0500</pubDate>
+      
+      <guid>http://weblogic.cafe/posts/operator-201/</guid>
+      <description>In case you missed it, we released version 2.0.1 of the WebLogic Kubernetes Operator this week. This release mainly contains bug fixes, but we also announced certification for OpenShift.
+This means you can now run WebLogic Server on OpenShift using our operator and you can call Oracle Support to log a Service Request, or of course, come talk to us on our public slack channel.
+What&amp;rsquo;s next? We are working on support for JRF-enable domains, i.</description>
+    </item>
     
     <item>
       <title>Configuring a WebLogic Data Source to use ATP</title>
