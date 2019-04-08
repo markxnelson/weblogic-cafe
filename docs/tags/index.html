@@ -37,7 +37,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://weblogic.cafe/tags/" />
-<meta property="og:updated_time" content="2019-02-04T12:16:44-05:00"/>
+<meta property="og:updated_time" content="2019-04-08T09:36:43-04:00"/>
 <meta itemprop="name" content="Tags">
 <meta itemprop="description" content="">
 
@@ -144,6 +144,21 @@ if (!doNotTrack) {
             Tag: atp
           </a>
         </h2>
+        
+          <div class="relative w-100 mb4 bg-white nested-copy-line-height">
+  <div class="bg-white mb3 pa4 gray overflow-hidden">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="../posts/atp-secret/" class="link black dim">
+        Storing ATP Wallets in a Kubernetes Secret
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      In this previous post, we talked about how to create a WebLogic datasource for an ATP database. In that example we put the ATP wallet into the domain directly, which is fine if your domain is on a secure environment, but if we want to use ATP from a WebLogic domain running in Kubernetes, you might not want to burn the wallet into the Docker image. Doing so would enable anyone with access to the Docker image to retrieve the wallet.
+    </div>
+  </div>
+</div>
+
         
           <div class="relative w-100 mb4 bg-white nested-copy-line-height">
   <div class="bg-white mb3 pa4 gray overflow-hidden">

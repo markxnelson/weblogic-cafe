@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Sat, 09 Mar 2019 09:59:26 -0500</lastBuildDate>
+    <lastBuildDate>Mon, 08 Apr 2019 09:36:43 -0400</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Storing ATP Wallets in a Kubernetes Secret</title>
+      <link>http://weblogic.cafe/posts/atp-secret/</link>
+      <pubDate>Mon, 08 Apr 2019 09:36:43 -0400</pubDate>
+      
+      <guid>http://weblogic.cafe/posts/atp-secret/</guid>
+      <description>In this previous post, we talked about how to create a WebLogic datasource for an ATP database. In that example we put the ATP wallet into the domain directly, which is fine if your domain is on a secure environment, but if we want to use ATP from a WebLogic domain running in Kubernetes, you might not want to burn the wallet into the Docker image. Doing so would enable anyone with access to the Docker image to retrieve the wallet.</description>
+    </item>
     
     <item>
       <title>Operator 2.0.1 Released with OpenShift Certification</title>
