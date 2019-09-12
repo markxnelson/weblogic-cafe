@@ -9,10 +9,10 @@
     <meta name="MobileOptimized" content="320">
 
     <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <meta name="generator" content="Hugo 0.47.1" />
+    <meta name="generator" content="Hugo 0.58.1" />
     
     
-      <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
     
 
     
@@ -34,8 +34,9 @@
 <meta property="og:description" content="In this post I am going to share details about how to configure a WebLogic data source to use ATP.
 If you are not familiar with ATP, it is the new Autonomous Transaction Processing service on Oracle Cloud. It provides a fully managed autonomous database. You can create a new database in the OCI console in the Database menu under &ldquo;Autonomous Transaction Processing&rdquo; by clicking on that big blue button:" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://weblogic.cafe/posts/atp-datasource/" /><meta property="article:published_time" content="2019-02-04T12:16:44-05:00"/>
-<meta property="article:modified_time" content="2019-02-04T12:16:44-05:00"/>
+<meta property="og:url" content="http://weblogic.cafe/posts/atp-datasource/" />
+<meta property="article:published_time" content="2019-02-04T12:16:44-05:00" />
+<meta property="article:modified_time" content="2019-02-04T12:16:44-05:00" />
 <meta itemprop="name" content="Configuring a WebLogic Data Source to use ATP">
 <meta itemprop="description" content="In this post I am going to share details about how to configure a WebLogic data source to use ATP.
 If you are not familiar with ATP, it is the new Autonomous Transaction Processing service on Oracle Cloud. It provides a fully managed autonomous database. You can create a new database in the OCI console in the Database menu under &ldquo;Autonomous Transaction Processing&rdquo; by clicking on that big blue button:">
@@ -53,22 +54,9 @@ If you are not familiar with ATP, it is the new Autonomous Transaction Processin
 <meta name="twitter:description" content="In this post I am going to share details about how to configure a WebLogic data source to use ATP.
 If you are not familiar with ATP, it is the new Autonomous Transaction Processing service on Oracle Cloud. It provides a fully managed autonomous database. You can create a new database in the OCI console in the Database menu under &ldquo;Autonomous Transaction Processing&rdquo; by clicking on that big blue button:"/>
 
-      
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-129126578-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-    
   </head>
 
-  <body class="ma0 avenir bg-near-white production">
+  <body class="ma0 avenir bg-near-white">
 
     
    
@@ -167,59 +155,39 @@ database.  You can create a new database in the OCI console in the Database
 menu under &ldquo;Autonomous Transaction Processing&rdquo; by clicking on that big
 blue button:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp001.png" />
-    
-    
+    <img src="../../images/atp001.png"/> 
 </figure>
 
 
 <p>You need to give it a name, choose the number of cores and set an admin
 password:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp002.png" />
-    
-    
+    <img src="../../images/atp002.png"/> 
 </figure>
 
 
 <p>It will take a few minutes to provision the database.  Once it is ready,
 click on the database to view details.</p>
 
-
 <figure>
-    
-        <img src="../../images/atp003.png" />
-    
-    
+    <img src="../../images/atp003.png"/> 
 </figure>
 
 
 <p>Then click on the &ldquo;DB Connection&rdquo;
 button to download the wallet that we will need to connect to the database.</p>
 
-
 <figure>
-    
-        <img src="../../images/atp004.png" />
-    
-    
+    <img src="../../images/atp004.png"/> 
 </figure>
 
 
 <p>You need to provide a password for the wallet, and then you can download it:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp005.png" />
-    
-    
+    <img src="../../images/atp005.png"/> 
 </figure>
 
 
@@ -254,46 +222,30 @@ to create the data source, here is an example:</p>
 <p>You can now log in to the WebLogic console and create a data source, give it
 a name on the first page:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp006.png" />
-    
-    
+    <img src="../../images/atp006.png"/> 
 </figure>
 
 
 <p>You can take the defaults on the second page:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp007.png" />
-    
-    
+    <img src="../../images/atp007.png"/> 
 </figure>
 
 
 <p>And the third:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp008.png" />
-    
-    
+    <img src="../../images/atp008.png"/> 
 </figure>
 
 
 <p>On the next page, you need set the database name, hostname and port to the
 values from the <code>tnsnames.ora</code>:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp009.png" />
-    
-    
+    <img src="../../images/atp009.png"/> 
 </figure>
 
 
@@ -321,12 +273,8 @@ oracle.jdbc.fanEnabled=false
 <p>Also notice the the URL format is <code>jdbc:oracle:thin:@cafedatabase_high</code>, you
 just need to put the name in there from the <code>tnsnames.ora</code> file:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp010.png" />
-    
-    
+    <img src="../../images/atp010.png"/> 
 </figure>
 
 
@@ -334,35 +282,23 @@ just need to put the name in there from the <code>tnsnames.ora</code> file:</p>
 and we are done!  Click on the &ldquo;Finish&rdquo; button and then you can activate
 changes if you are in production mode.</p>
 
-
 <figure>
-    
-        <img src="../../images/atp011.png" />
-    
-    
+    <img src="../../images/atp011.png"/> 
 </figure>
 
 
 <p>You can now go and test the data source (in the &ldquo;Monitoring&rdquo; tab and then
 &ldquo;Testing&rdquo;, select the data source and click on the &ldquo;Test Data Source&rdquo; button.</p>
 
-
 <figure>
-    
-        <img src="../../images/atp012.png" />
-    
-    
+    <img src="../../images/atp012.png"/> 
 </figure>
 
 
 <p>You will see the success message:</p>
 
-
 <figure>
-    
-        <img src="../../images/atp013.png" />
-    
-    
+    <img src="../../images/atp013.png"/> 
 </figure>
 
 

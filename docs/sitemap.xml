@@ -7,8 +7,43 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/posts/oow/</loc>
+    <lastmod>2019-09-12T13:51:03-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/posts/</loc>
+    <lastmod>2019-09-12T13:51:03-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/</loc>
+    <lastmod>2019-09-12T13:51:03-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/atp/</loc>
+    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/atp-secret/</loc>
     <lastmod>2019-04-08T09:36:43-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/</loc>
+    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/openshift/</loc>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/operator/</loc>
+    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
   </url>
   
   <url>
@@ -22,8 +57,18 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/weblogic/</loc>
+    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/weblogic-on-openshift/</loc>
     <lastmod>2019-01-19T08:30:16-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/kubernetes/</loc>
+    <lastmod>2019-01-16T17:14:28-05:00</lastmod>
   </url>
   
   <url>
@@ -32,12 +77,27 @@
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/docker/</loc>
+    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/openshift-relocate-var-lib-docker/</loc>
     <lastmod>2019-01-13T18:02:10-05:00</lastmod>
   </url>
   
   <url>
+    <loc>http://weblogic.cafe/tags/oci/</loc>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://weblogic.cafe/posts/spinnaker/</loc>
+    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://weblogic.cafe/tags/spinnaker/</loc>
     <lastmod>2019-01-09T10:00:29-05:00</lastmod>
   </url>
   
@@ -54,72 +114,6 @@
   <url>
     <loc>http://weblogic.cafe/posts/hello/</loc>
     <lastmod>2018-12-04T10:02:12-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/atp/</loc>
-    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/docker/</loc>
-    <lastmod>2019-01-13T18:02:10-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/kubernetes/</loc>
-    <lastmod>2019-01-16T17:14:28-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/oci/</loc>
-    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/openshift/</loc>
-    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/operator/</loc>
-    <lastmod>2019-03-09T09:59:26-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/posts/</loc>
-    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/spinnaker/</loc>
-    <lastmod>2019-01-09T10:00:29-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/</loc>
-    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/</loc>
-    <lastmod>2019-04-08T09:36:43-04:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://weblogic.cafe/tags/weblogic/</loc>
-    <lastmod>2019-02-04T12:16:44-05:00</lastmod>
-    <priority>0</priority>
   </url>
   
 </urlset>

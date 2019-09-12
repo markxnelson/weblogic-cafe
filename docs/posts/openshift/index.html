@@ -9,10 +9,10 @@
     <meta name="MobileOptimized" content="320">
 
     <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <meta name="generator" content="Hugo 0.47.1" />
+    <meta name="generator" content="Hugo 0.58.1" />
     
     
-      <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
     
 
     
@@ -34,8 +34,9 @@
 <meta property="og:description" content="In this post, I want to share my experiences with running OpenShift on Oracle Cloud Infrastructure (OCI). This is not strictly a &ldquo;how to&rdquo; because I did set this up as a test/development system, not a production one, so I did take a few small short cuts, but I hope that it is still helpful to share.
 I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the &ldquo;all in one&rdquo; configuration." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://weblogic.cafe/posts/openshift/" /><meta property="article:published_time" content="2018-12-07T17:00:00-05:00"/>
-<meta property="article:modified_time" content="2018-12-07T17:00:00-05:00"/>
+<meta property="og:url" content="http://weblogic.cafe/posts/openshift/" />
+<meta property="article:published_time" content="2018-12-07T17:00:00-05:00" />
+<meta property="article:modified_time" content="2018-12-07T17:00:00-05:00" />
 <meta itemprop="name" content="Running OpenShift on OCI">
 <meta itemprop="description" content="In this post, I want to share my experiences with running OpenShift on Oracle Cloud Infrastructure (OCI). This is not strictly a &ldquo;how to&rdquo; because I did set this up as a test/development system, not a production one, so I did take a few small short cuts, but I hope that it is still helpful to share.
 I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the &ldquo;all in one&rdquo; configuration.">
@@ -53,22 +54,9 @@ I am going to set up OpenShift Enterprise 3.11 on a single compute instance on O
 <meta name="twitter:description" content="In this post, I want to share my experiences with running OpenShift on Oracle Cloud Infrastructure (OCI). This is not strictly a &ldquo;how to&rdquo; because I did set this up as a test/development system, not a production one, so I did take a few small short cuts, but I hope that it is still helpful to share.
 I am going to set up OpenShift Enterprise 3.11 on a single compute instance on Oracle Cloud Infrastructure (OCI), so I am using the &ldquo;all in one&rdquo; configuration."/>
 
-      
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-129126578-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-    
   </head>
 
-  <body class="ma0 avenir bg-near-white production">
+  <body class="ma0 avenir bg-near-white">
 
     
    
@@ -196,12 +184,8 @@ start by creating a <em>compartment</em>, I called mine <code>OpenShift</code>. 
 create a compartment in <a href="https://console.us-phoenix-1.oraclecloud.com">the OCI Console</a>
 in the &ldquo;Identity&rdquo; menu, then &ldquo;Compartments&rdquo;.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift001.png" />
-    
-    
+    <img src="../../images/openshift001.png"/> 
 </figure>
 
 
@@ -219,12 +203,8 @@ create two groups:</p>
 <li><code>OpenShiftUsers</code></li>
 </ul>
 
-
 <figure>
-    
-        <img src="../../images/openshift002.png" />
-    
-    
+    <img src="../../images/openshift002.png"/> 
 </figure>
 
 
@@ -244,12 +224,8 @@ called mine <code>OpenShiftAdministratorsPolicy</code> and add these five <em>po
 
 <p>In the &ldquo;policy versioning&rdquo; section choose the option to &ldquo;keep policy current&rdquo;.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift003.png" />
-    
-    
+    <img src="../../images/openshift003.png"/> 
 </figure>
 
 
@@ -314,60 +290,40 @@ and check the &ldquo;Create virtual cloud network plus related resources&rdquo; 
 leave everything else at the defaults and click on &ldquo;Create Virtual Cloud Network&rdquo;.
 When it is done, click on the &ldquo;Close&rdquo; button.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift009.png" />
-    
-    
+    <img src="../../images/openshift009.png"/> 
 </figure>
 
 
 <p>You will see your new VCN, click on that to view it, and then find the subnet
 that matches the Availability Domain that you want to use, I used <code>AD-3</code>.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift010.png" />
-    
-    
+    <img src="../../images/openshift010.png"/> 
 </figure>
 
 
 <p>Click on the security list for that subnet to view it, then click on the &ldquo;Edit
 All Rules&rdquo; button.  Find the rule for ICMP, and change it from <code>3, 4</code> to <code>All</code>:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift011.png" />
-    
-    
+    <img src="../../images/openshift011.png"/> 
 </figure>
 
 
 <p>Click on the &ldquo;+ Another Ingress Rule&rdquo; button to create another rule, and set it
 up for source CIDR <code>0.0.0.0/0</code> and destination port <code>80, 8443</code>:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift012.png" />
-    
-    
+    <img src="../../images/openshift012.png"/> 
 </figure>
 
 
 <p>Now click on the &ldquo;Save security list rules&rdquo; button to save them.  Now your
 security list should look like this:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift013.png" />
-    
-    
+    <img src="../../images/openshift013.png"/> 
 </figure>
 
 
@@ -386,12 +342,8 @@ don&rsquo;t already have one.  This is done in the &ldquo;Object Storage&rdquo; 
 Storage&rdquo;.  Make sure you choose your compartment - don&rsquo;t create it in the
 root compartment.  I called my bucket <code>ISO-Images</code>.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift004.png" />
-    
-    
+    <img src="../../images/openshift004.png"/> 
 </figure>
 
 
@@ -430,36 +382,24 @@ to know the magic URL!</p>
 <p>To create it, click on the &ldquo;three dots&rdquo; next to your ISO image and choose
 &ldquo;Create Pre-Authenticated Request&rdquo; from the menu:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift005.png" />
-    
-    
+    <img src="../../images/openshift005.png"/> 
 </figure>
 
 
 <p>You need to give it a name, and you can keep the read-only option and
 set a reasonable expiration time - a couple of hours will be plenty of time:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift006.png" />
-    
-    
+    <img src="../../images/openshift006.png"/> 
 </figure>
 
 
 <p>It will give you a URL to access the ISO file - make sure you keep that URL,
 you will need it later:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift007.png" />
-    
-    
+    <img src="../../images/openshift007.png"/> 
 </figure>
 
 
@@ -468,12 +408,8 @@ you will need it later:</p>
 <p>As I mentioned earlier, we will use Terraform to drive the image creation
 process.  It is going to work like this:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift008.png" />
-    
-    
+    <img src="../../images/openshift008.png"/> 
 </figure>
 
 
@@ -517,40 +453,40 @@ set up to take the values from the environment.  So you can just edit the
 
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
 </span></span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">### Authentication details
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>export TF_VAR_tenancy_ocid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">### Authentication details</span>
+<span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_tenancy_ocid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
 </span><span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_user_ocid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
 </span><span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_fingerprint<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
 </span><span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_private_key_path<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
 </span>
-<span style="color:#75715e">### Optional API Private key passphrase (if set)
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>export TF_VAR_private_key_password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
+<span style="color:#75715e">### Optional API Private key passphrase (if set)</span>
+<span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_private_key_password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxx&#34;</span>
 </span>
-<span style="color:#75715e">### Region
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>export TF_VAR_region<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;us-phoenix-1&#34;</span>
+<span style="color:#75715e">### Region</span>
+<span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_region<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;us-phoenix-1&#34;</span>
 </span>
-<span style="color:#75715e">### Public keys used on the instance
-</span><span style="color:#75715e">## NOTE: These are not your api keys. More info on the right keys see
-</span><span style="color:#75715e">## https://docs.us-phoenix-1.oraclecloud.com/Content/Compute/Tasks/managingkeypairs.htm
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>export TF_VAR_ssh_public_key<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat xxx<span style="color:#66d9ef">)</span></span></code></pre></td></tr></table>
+<span style="color:#75715e">### Public keys used on the instance</span>
+<span style="color:#75715e">## NOTE: These are not your api keys. More info on the right keys see</span>
+<span style="color:#75715e">## https://docs.us-phoenix-1.oraclecloud.com/Content/Compute/Tasks/managingkeypairs.htm</span>
+<span style="display:block;width:100%;background-color:#3c3d38">export TF_VAR_ssh_public_key<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat xxx<span style="color:#66d9ef">)</span></span></code></pre></td></tr></table>
 </div>
 </div>
 
@@ -576,57 +512,57 @@ are highlighted:</p>
 
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">34
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Set your information here:
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e"># iso_url - specify the URL for the RHEL ISO.  This can be any publically accessible URL.
-</span><span style="color:#75715e"># The URL must contain the name of the ISO image with an &#39;.iso&#39; extension.
-</span><span style="color:#75715e"></span>
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Set your information here:</span>
+
+<span style="color:#75715e"># iso_url - specify the URL for the RHEL ISO.  This can be any publically accessible URL.</span>
+<span style="color:#75715e"># The URL must contain the name of the ISO image with an &#39;.iso&#39; extension.</span>
+
 variable <span style="color:#e6db74">&#34;iso_url&#34;</span> <span style="color:#f92672">{</span>
 <span style="display:block;width:100%;background-color:#3c3d38">	default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your pre-authenticated request url&gt;&#34;</span>
 </span><span style="color:#f92672">}</span>
 
-<span style="color:#75715e"># RHEL account variables:
-</span><span style="color:#75715e"># user_name - The user name of the account that holds the subscription
-</span><span style="color:#75715e"># password - password for said user name
-</span><span style="color:#75715e"></span>
+<span style="color:#75715e"># RHEL account variables:</span>
+<span style="color:#75715e"># user_name - The user name of the account that holds the subscription</span>
+<span style="color:#75715e"># password - password for said user name</span>
+
 variable <span style="color:#e6db74">&#34;rhel_account&#34;</span> <span style="color:#f92672">{</span>
 	type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;map&#34;</span>
 	default <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>
@@ -635,12 +571,12 @@ variable <span style="color:#e6db74">&#34;rhel_account&#34;</span> <span style="
 </span>	<span style="color:#f92672">}</span>
 <span style="color:#f92672">}</span>
 
-<span style="color:#75715e"># Build environment variables:
-</span><span style="color:#75715e"># compartment - your compartment name
-</span><span style="color:#75715e"># ad - which Availability Domain to use. Format in either AD-x or ad-x where &#39;x&#39; is the AD number
-</span><span style="color:#75715e"># vcn - the display name of the vcn to use
-</span><span style="color:#75715e"># subnet - display name of the subnet to use
-</span><span style="color:#75715e"></span>
+<span style="color:#75715e"># Build environment variables:</span>
+<span style="color:#75715e"># compartment - your compartment name</span>
+<span style="color:#75715e"># ad - which Availability Domain to use. Format in either AD-x or ad-x where &#39;x&#39; is the AD number</span>
+<span style="color:#75715e"># vcn - the display name of the vcn to use</span>
+<span style="color:#75715e"># subnet - display name of the subnet to use</span>
+
 variable <span style="color:#e6db74">&#34;build_env&#34;</span> <span style="color:#f92672">{</span>
 	type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;map&#34;</span>
 	default <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>
@@ -673,14 +609,14 @@ for you.  Set the shape on line 24:</p>
 
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">variable <span style="color:#e6db74">&#34;ipxe_instance&#34;</span> <span style="color:#f92672">{</span>
@@ -745,12 +681,8 @@ clean up (there will not be a resource to actually kill, so force is required):<
 <p>You should be able to see your new custom image in the OCI Console under &ldquo;Compute&rdquo;
 and then &ldquo;Custom Images&rdquo;:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift014.png" />
-    
-    
+    <img src="../../images/openshift014.png"/> 
 </figure>
 
 
@@ -764,12 +696,8 @@ OpenShift.</p>
 this, we go to the &ldquo;Compute&rdquo; menu, then &ldquo;Instances&rdquo; and click on the &ldquo;Create
 Instance&rdquo; button.  This will bring up the following page:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift015.png" />
-    
-    
+    <img src="../../images/openshift015.png"/> 
 </figure>
 
 
@@ -796,12 +724,8 @@ new instance.</li>
 <p>Once you have all this set up, click on the &ldquo;Create&rdquo; button to create the
 instance.</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift016.png" />
-    
-    
+    <img src="../../images/openshift016.png"/> 
 </figure>
 
 
@@ -891,68 +815,68 @@ the following content (this is also in the repository that you cloned as
 
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">18
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">20
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">21
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">23
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">24
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">25
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">26
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">27
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">28
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">34
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">38
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">39
-</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">40
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">41
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">42
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">43
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span></span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
 </span></span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create an OSEv3 group that contains the masters, nodes, and etcd groups
-</span><span style="color:#75715e"></span><span style="color:#f92672">[</span>OSEv3:children<span style="color:#f92672">]</span>
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create an OSEv3 group that contains the masters, nodes, and etcd groups</span>
+<span style="color:#f92672">[</span>OSEv3:children<span style="color:#f92672">]</span>
 masters
 nodes
 etcd
 
-<span style="color:#75715e"># Set variables common for all OSEv3 hosts
-</span><span style="color:#75715e"></span><span style="color:#f92672">[</span>OSEv3:vars<span style="color:#f92672">]</span>
-<span style="color:#75715e"># SSH user, this user should allow ssh based auth without requiring a password
-</span><span style="color:#75715e"></span>ansible_ssh_user<span style="color:#f92672">=</span>root
+<span style="color:#75715e"># Set variables common for all OSEv3 hosts</span>
+<span style="color:#f92672">[</span>OSEv3:vars<span style="color:#f92672">]</span>
+<span style="color:#75715e"># SSH user, this user should allow ssh based auth without requiring a password</span>
+ansible_ssh_user<span style="color:#f92672">=</span>root
 
-<span style="color:#75715e"># If ansible_ssh_user is not root, ansible_become must be set to true
-</span><span style="color:#75715e">#ansible_become=true
-</span><span style="color:#75715e"></span>
+<span style="color:#75715e"># If ansible_ssh_user is not root, ansible_become must be set to true</span>
+<span style="color:#75715e">#ansible_become=true</span>
+
 openshift_deployment_type<span style="color:#f92672">=</span>openshift-enterprise
-<span style="color:#75715e">#oreg_url=example.com/openshift3/ose-${component}:${version}
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#75715e"></span>oreg_auth_user<span style="color:#f92672">=</span>&lt;your_userid&gt;
+<span style="color:#75715e">#oreg_url=example.com/openshift3/ose-${component}:${version}</span>
+<span style="display:block;width:100%;background-color:#3c3d38">oreg_auth_user<span style="color:#f92672">=</span>&lt;your_userid&gt;
 </span><span style="display:block;width:100%;background-color:#3c3d38">oreg_auth_password<span style="color:#f92672">=</span>&lt;your_password&gt;
 </span>openshift_examples_modify_imagestreams<span style="color:#f92672">=</span>true
 
@@ -965,19 +889,19 @@ openshift_deployment_type<span style="color:#f92672">=</span>openshift-enterpris
 </span><span style="display:block;width:100%;background-color:#3c3d38">openshift_master_cluster_hostname<span style="color:#f92672">=</span>&lt;your fqdn&gt;
 </span><span style="display:block;width:100%;background-color:#3c3d38">openshift_master_cluster_ip<span style="color:#f92672">=</span>&lt;your private ip address&gt;
 </span>
-<span style="color:#75715e"># uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
-</span><span style="color:#75715e">#openshift_master_identity_providers=[{&#39;name&#39;: &#39;htpasswd_auth&#39;, &#39;login&#39;: &#39;true&#39;, &#39;challenge&#39;: &#39;true&#39;, &#39;kind&#39;: &#39;HTPasswdPasswordIdentityProvider&#39;}]
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e"># host group for masters
-</span><span style="color:#75715e"></span><span style="color:#f92672">[</span>masters<span style="color:#f92672">]</span>
+<span style="color:#75715e"># uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider</span>
+<span style="color:#75715e">#openshift_master_identity_providers=[{&#39;name&#39;: &#39;htpasswd_auth&#39;, &#39;login&#39;: &#39;true&#39;, &#39;challenge&#39;: &#39;true&#39;, &#39;kind&#39;: &#39;HTPasswdPasswordIdentityProvider&#39;}]</span>
+
+<span style="color:#75715e"># host group for masters</span>
+<span style="color:#f92672">[</span>masters<span style="color:#f92672">]</span>
 <span style="display:block;width:100%;background-color:#3c3d38">&lt;your fqdn&gt; openshift_ip<span style="color:#f92672">=</span>&lt;your private ip&gt; openshift_hostname<span style="color:#f92672">=</span>&lt;your hostname&gt; openshift_master_cluster_hostname<span style="color:#f92672">=</span>&lt;your fqdn&gt; openshift_master_cluster_ip<span style="color:#f92672">=</span>&lt;your private ip&gt; openshift_public_ip<span style="color:#f92672">=</span>&lt;your public ip&gt; openshift_node_group_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;node-config-all-in-one&#39;</span>
 </span>
-<span style="color:#75715e"># host group for etcd
-</span><span style="color:#75715e"></span><span style="color:#f92672">[</span>etcd<span style="color:#f92672">]</span>
+<span style="color:#75715e"># host group for etcd</span>
+<span style="color:#f92672">[</span>etcd<span style="color:#f92672">]</span>
 <span style="display:block;width:100%;background-color:#3c3d38">&lt;your fqdn&gt; openshift_ip<span style="color:#f92672">=</span>&lt;your private ip&gt;
 </span>
-<span style="color:#75715e"># host group for nodes, includes region info
-</span><span style="color:#75715e"></span><span style="color:#f92672">[</span>nodes<span style="color:#f92672">]</span>
+<span style="color:#75715e"># host group for nodes, includes region info</span>
+<span style="color:#f92672">[</span>nodes<span style="color:#f92672">]</span>
 <span style="display:block;width:100%;background-color:#3c3d38">&lt;your fqdn&gt; openshift_node_group_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;node-config-all-in-one&#39;</span></span></code></pre></td></tr></table>
 </div>
 </div>
@@ -1005,12 +929,8 @@ same as the one on line 25), and</li>
 the same values as you did earlier.</li>
 </ul>
 
-
 <figure>
-    
-        <img src="../../images/openshift017.png" />
-    
-    
+    <img src="../../images/openshift017.png"/> 
 </figure>
 
 
@@ -1210,12 +1130,8 @@ public IP address in there):</p>
 <p>Then you should be able to hit the OpenShift <a href="http://openshift:8443/console">console</a>
 in your browser.  It looks like this:</p>
 
-
 <figure>
-    
-        <img src="../../images/openshift018.png" />
-    
-    
+    <img src="../../images/openshift018.png"/> 
 </figure>
 
 
@@ -1251,19 +1167,19 @@ in the example below, on lines 6 to 13:</p>
 
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
-</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
-</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
 </span></span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">oauthConfig:

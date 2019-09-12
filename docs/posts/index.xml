@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2018, Mark Nelson</copyright>
-    <lastBuildDate>Mon, 08 Apr 2019 09:36:43 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 12 Sep 2019 13:51:03 -0400</lastBuildDate>
     
 	<atom:link href="http://weblogic.cafe/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Oracle OpenWorld 2019</title>
+      <link>http://weblogic.cafe/posts/oow/</link>
+      <pubDate>Thu, 12 Sep 2019 13:51:03 -0400</pubDate>
+      
+      <guid>http://weblogic.cafe/posts/oow/</guid>
+      <description>Hi everyone! I have not written as many posts as I had hoped to lately, but I have been busy getting ready for Oracle OpenWorld next week and we have some exciting things to share with you all there.
+We have a Program Guide for WebLogic, Coherence and Helidon available that lists a lot of great sessions you can attend, including some that I will be presenting at.
+The Enterprise Java Roadmap session on Monday 9-9.</description>
+    </item>
     
     <item>
       <title>Storing ATP Wallets in a Kubernetes Secret</title>
