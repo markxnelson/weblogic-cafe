@@ -8,7 +8,7 @@ tags: [openshift,operator]
 In case you missed it, we released version 2.0.1 of the [WebLogic Kubernetes
 Operator](https://github.com/oracle/weblogic-kubernetes-operator) this week. 
 This release mainly contains bug fixes, but we also
-announced [certification for OpenShift](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/user-guide.md#openshift).
+announced [certification for OpenShift](https://oracle.github.io/weblogic-kubernetes-operator/userguide/introduction/introduction/#openshift).
 
 This means you can now run WebLogic Server on OpenShift using our operator
 and you can call Oracle Support to log a Service Request, or of course, 
